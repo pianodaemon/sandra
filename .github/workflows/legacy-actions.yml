@@ -15,3 +15,9 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn clean && mvn compile && mvn test-compile && mvn dependency:copy-dependencies && mvn jar:jar && mvn test
+      - name: Provision DynamoDB
+        run: |
+          # make file runnable, might not be necessary
+          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/test_products_dal.sh"
+          # run script
+          "${GITHUB_WORKSPACE}/.github/scripts/test_products_dal.sh"
