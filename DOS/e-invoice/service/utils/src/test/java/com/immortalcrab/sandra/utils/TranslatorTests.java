@@ -39,8 +39,8 @@ class TranslatorTests {
         try {
             String[] expected = translateIntegerToSpanish(argv).split("\n");
             for (int i = 0; i < expected.length; i++) {
-                expected[i] = postprocessing(expected[i]);
-                assertEquals(expected[i], remueveTildes(NumberToSpanishTranslator.translate(Long.parseLong(argv[i]))));
+                assertEquals(postprocessing(expected[i]),
+                        remueveTildes(NumberToSpanishTranslator.translate(Long.parseLong(argv[i]))));
             }
         } catch (Exception e) {
             assertEquals(true, false);
