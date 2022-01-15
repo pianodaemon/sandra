@@ -195,3 +195,8 @@ def numspatrans(n):
        return __transdec6(int(n))
     except ValueError:
        raise
+
+import sys
+
+for i in sys.argv:
+    print(numspatrans(i))
