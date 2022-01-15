@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.StringWriter;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.Properties;
 
@@ -11,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import org.python.util.PythonInterpreter;
-
 
 class TranslatorTests {
 
@@ -63,13 +64,11 @@ class TranslatorTests {
 
     static String translateIntegerToSpanish(String[] argv) throws Exception {
 
-        String resourcesDir = System.getenv("RESOURCES_DIR");
-        if (resourcesDir == null) {
-            resourcesDir = "/resources";
-        }
+        String resourcesDir = Paths.get("src", "test", "resources").toFile().getAbsolutePath();
+
         Properties preProps = System.getProperties();
         Properties postProps = new Properties();
-        
+
         File pyScript = new File(resourcesDir + "/numspatrans.py");
         byte[] bytes = Files.readAllBytes(pyScript.toPath());
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
