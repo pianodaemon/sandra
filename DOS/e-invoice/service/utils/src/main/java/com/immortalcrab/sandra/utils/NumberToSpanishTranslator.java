@@ -69,7 +69,7 @@ public class NumberToSpanishTranslator {
             return "cien";
         }
 
-        var s = new ArrayList<String>();
+        ArrayList<String> s = new ArrayList<String>();
         int centenas = cifra / 100;
         if (centenas > 0) {
             s.add(cent.get(centenas));
@@ -118,7 +118,7 @@ public class NumberToSpanishTranslator {
         boolean billones = false;
         boolean trillones = false;
 
-        var resultado = new ArrayList<String>();
+        ArrayList<String> resultado = new ArrayList<String>();
         int ini = 0;
         int fin;
         if (cifrasRemanentes > 0) {
@@ -139,12 +139,21 @@ public class NumberToSpanishTranslator {
                     }
                     resultado.add("mil");
                 }
-                if (i == 3 || i == 4) {
-                    millones = true;
-                } else if (i == 5 || i == 6) {
-                    billones = true;
-                } else if (i == 7 || i == 8) {
-                    trillones = true;
+                switch (i) {
+                    case 3:
+                    case 4:
+                        millones = true;
+                        break;
+                    case 5:
+                    case 6:
+                        billones = true;
+                        break;
+                    case 7:
+                    case 8:
+                        trillones = true;
+                        break;
+                    default:
+                        break;
                 }
             }
 
