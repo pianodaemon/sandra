@@ -30,7 +30,7 @@ class TranslatorTests {
     @Test
     void randomTranslations() {
         int len = 10000;
-        var argv = new String[len];
+        String[] argv = new String[len];
 
         for (int i = 0; i < len; i++) {
             argv[i] = String.valueOf(getRandomLong(0l, 10000000l));
@@ -48,7 +48,7 @@ class TranslatorTests {
     }
 
     static long getRandomLong(long min, long range) {
-        var rand = new Random();
+        Random rand = new Random();
         long n = rand.nextLong();
         return min + (n < 0l ? n * -1l : n) % range;
     }
@@ -67,13 +67,13 @@ class TranslatorTests {
         if (resourcesDir == null) {
             resourcesDir = "/resources";
         }
-        var preProps = System.getProperties();
-        var postProps = new Properties();
+        Properties preProps = System.getProperties();
+        Properties postProps = new Properties();
         
-        var pyScript = new File(resourcesDir + "/numspatrans.py");
+        File pyScript = new File(resourcesDir + "/numspatrans.py");
         byte[] bytes = Files.readAllBytes(pyScript.toPath());
-        var bais = new ByteArrayInputStream(bytes);
-        var out = new StringWriter();
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        StringWriter out = new StringWriter();
 
         PythonInterpreter.initialize(preProps, postProps, argv);
 
