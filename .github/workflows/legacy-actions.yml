@@ -5,6 +5,8 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      e-invoice-dir: "${GITHUB_WORKSPACE}/DOS/e-invoice"
 
     steps:
       - uses: actions/checkout@v2
@@ -13,8 +15,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Build with Maven
-        run: mvn clean && mvn compile && mvn test-compile && mvn dependency:copy-dependencies && mvn jar:jar && mvn test
+      - name: Test NumberToSpanishTranslator
+        working-directory: ${{env.e-invoice-dir}}/service/utils
+        run: |
+          #
+          mvn clean && mvn test
       - name: Provision DynamoDB
         run: |
           # make file runnable, might not be necessary
