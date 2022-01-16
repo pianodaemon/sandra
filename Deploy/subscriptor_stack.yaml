@@ -1,6 +1,17 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Create an S3 bucket and IAM user with access to that bucket.
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Subscriptor's configuration"
+        Parameters:
+          - SubscriptorPwd
+    ParameterLabels:
+      SubscriptorPwd:
+        default: "Password for this subscriptor account"
+
 Resources:
   CfdiWareHouse:
     Type: AWS::S3::Bucket
@@ -15,6 +26,8 @@ Resources:
     Type: AWS::IAM::User
     Properties:
       UserName: !Sub ${AWS::StackName}
+      LoginProfile:
+        Password: !Ref SubscriptorPwd
       Policies:
         - PolicyName: cfdiwarehouse-access
           PolicyDocument:
@@ -26,3 +39,11 @@ Resources:
               Resource:
                 - !Sub arn:aws:s3:::${CfdiWareHouse}
                 - !Sub arn:aws:s3:::${CfdiWareHouse}/*
+
+Parameters:
+  SubscriptorPwd:
+    NoEcho: true
+    Description: The subscriptor account password
+    Type: String
+    MinLength: 1
+    MaxLength: 41

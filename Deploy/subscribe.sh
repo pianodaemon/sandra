@@ -1,13 +1,41 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # XXX: Before run this
 # Don't forget to set AWS_PROFILE with the respective entitled profile
 
+declare -A AWS_STACK_PARAMS
+
+__prompt_passwd() {
+
+	local tpwd=''
+
+	echo -n Password:
+	read -s tpwd
+	echo
+	AWS_STACK_PARAMS[SubscriptorPwd]=$tpwd
+}
+
+__render_params() {
+
+	local params=''
+
+	for i in "${!AWS_STACK_PARAMS[@]}"; do
+		if [[ -z $params ]]; then
+			params="ParameterKey=$i,ParameterValue=${AWS_STACK_PARAMS[$i]}"
+		else
+			params="$params ParameterKey=$i,ParameterValue=${AWS_STACK_PARAMS[$i]}"
+		fi
+	done
+
+	echo $params
+}
+
 # Deploys the subscriptor stack
 __deploy_stack() {
 
+	__prompt_passwd
+
 	local temp="subscriptor_stack.yaml"
-	local deploy_cmd=$(printf 'aws cloudformation deploy --stack-name %s --template-file %s  --capabilities CAPABILITY_NAMED_IAM' "${1}" "${temp}")
 
 	# Verification of presence
 	if [[ ! -f $temp ]]; then
@@ -20,6 +48,8 @@ __deploy_stack() {
 		echo "Emptyness at Cloudformation template's content"
 		exit 1
 	fi
+
+	local deploy_cmd=$(printf 'aws cloudformation create-stack --stack-name %s --template-body file://%s  --capabilities CAPABILITY_NAMED_IAM --parameters %s' "${1}" "${temp}" "$(__render_params)")
 
 	$deploy_cmd
 }
