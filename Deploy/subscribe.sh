@@ -15,6 +15,16 @@ __prompt_passwd() {
 	AWS_STACK_PARAMS[SubscriptorPwd]=$tpwd
 }
 
+__prompt_env() {
+
+	local tenv=''
+
+	echo -n Enviroment:
+	read -s tenv
+	echo
+	AWS_STACK_PARAMS[SubscriptorEnv]=$tenv
+}
+
 __render_params() {
 
 	local params=''
@@ -33,6 +43,7 @@ __render_params() {
 # Deploys the subscriptor stack
 __deploy_stack() {
 
+	__prompt_env
 	__prompt_passwd
 
 	local temp="subscriptor_stack.yaml"
