@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Create an S3 bucket and IAM user with access to that bucket.
 
 Resources:
-  S3Bucket:
+  CfdiWareHouse:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub einvoice-${AWS::StackName}
@@ -10,3 +10,19 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+
+  Subscriptor:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub ${AWS::StackName}
+      Policies:
+        - PolicyName: cfdiwarehouse-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - s3:*
+              Resource:
+                - !Sub arn:aws:s3:::${CfdiWareHouse}
+                - !Sub arn:aws:s3:::${CfdiWareHouse}/*
