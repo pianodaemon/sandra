@@ -7,7 +7,7 @@
     <artifactId>sandra-utils</artifactId>
     <version>A-STAR-IS-BORN</version>
     <packaging>jar</packaging>
-    <name>generic sandra utils</name>
+    <name>misc-utils</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -10,5 +10,6 @@
         <module>../qrcode</module>
         <module>../cfdi-utils</module>
         <module>../utils</module>
+        <module>../issue</module>
     </modules>
 </project>
