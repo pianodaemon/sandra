@@ -12,6 +12,11 @@
     </properties>
     
     <dependencies>
+       <dependency>
+           <groupId>com.immortalcrab</groupId>
+           <artifactId>cfdi-utils</artifactId>
+           <version>LOLA-TRAILERA</version>
+       </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
