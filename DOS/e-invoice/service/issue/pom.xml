@@ -13,16 +13,6 @@
     
     <dependencies>
         <dependency>
-            <groupId>com.immortalcrab</groupId>
-            <artifactId>cfdi-utils</artifactId>
-            <version>LOLA-TRAILERA</version>
-        </dependency>
-        <dependency>
-            <groupId>com.immortalcrab</groupId>
-            <artifactId>qrcode</artifactId>
-            <version>LOLA-TRAILERA</version>
-        </dependency>
-        <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
             <version>1.2.1</version>
@@ -33,9 +23,9 @@
             <version>3.6.0</version>
         </dependency>
         <dependency>
-            <groupId>org.javatuples</groupId>
-            <artifactId>javatuples</artifactId>
-            <version>1.2</version>
+            <groupId>com.immortalcrab</groupId>
+            <artifactId>engine</artifactId>
+            <version>SANDRA</version>
         </dependency>
     </dependencies>
     

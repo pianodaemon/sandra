@@ -7,9 +7,10 @@
     <packaging>pom</packaging>
     <name>e-invoice</name>
     <modules>
-        <module>./service/qrcode</module>
-        <module>./service/cfdi-utils</module>
-        <module>./service/utils</module>
-        <module>./service/issue</module>
+        <module>service/qrcode</module>
+        <module>service/cfdi-utils</module>
+        <module>service/utils</module>
+        <module>service/issue</module>
+        <module>service/engine</module>
     </modules>
 </project>
