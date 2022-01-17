@@ -16,12 +16,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Compile java code of e-invoice
-        working-directory: ${{env.e-invoice-dir}}/service
+        working-directory: ${{env.e-invoice-dir}}
         run: |
           # Generates all .class stuff
           mvn compile  
       - name: Package and Test the java e-invoice jars
-        working-directory: ${{env.e-invoice-dir}}/service
+        working-directory: ${{env.e-invoice-dir}}
         run: |
           # It implicitly carries out compilation if needed
           mvn package
