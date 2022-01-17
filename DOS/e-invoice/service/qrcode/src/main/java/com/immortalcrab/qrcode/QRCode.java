@@ -1,16 +1,16 @@
 package com.immortalcrab.qrcode;
 
+import java.util.Base64;
+import java.util.Base64.Encoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-
 
 public class QRCode {
 
@@ -27,5 +27,11 @@ public class QRCode {
         var out = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", out);
         return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public static String generateBase64EncodedString(String text, int width, int height) throws Exception {
+        ByteArrayInputStream bais = generateByteStream(text, width, height);
+        Encoder encoder = Base64.getEncoder();
+        return encoder.encodeToString(bais.readAllBytes());
     }
 }
