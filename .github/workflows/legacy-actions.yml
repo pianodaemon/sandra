@@ -26,7 +26,7 @@ jobs:
           # shaded artifact
           mvn package shade:shade
       - name: Package and Test java code of heat jars
-        working-directory: ${{env.e-invoice-dir}}/service/misc-utils
+        working-directory: ${{env.e-invoice-dir}}/service/heat
         run: |
           # It implicitly carries out compilation if needed
           mvn package
