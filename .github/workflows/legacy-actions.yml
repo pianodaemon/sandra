@@ -20,12 +20,7 @@ jobs:
         run: |
           # Generates all .class stuff
           mvn compile  
-      - name: Package lambda to issue cfdi
-        working-directory: ${{env.e-invoice-dir}}/service/issue
-        run: |
-          # shaded artifact
-          mvn package shade:shade
-      - name: Package and Test java code of heat jars
+      - name: Package and Test the java heat jars
         working-directory: ${{env.e-invoice-dir}}/service/heat
         run: |
           # It implicitly carries out compilation if needed
