@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.StringWriter;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.Properties;
@@ -59,6 +58,7 @@ class TranslatorTests {
         output = output.replaceAll("doscientos", "docientos");
         output = output.replaceAll("trescientos", "trecientos");
         output = output.replaceAll("  ", " ");
+        output = output.replaceAll("uno$", "un");
         return output;
     }
 
