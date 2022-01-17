@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  inceptor
+
+  Sample SAM Template for inceptor
+
+Globals:
+  Function:
+    Timeout: 20
+
+Resources:
+  CfdiIssueFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: issue
+      Handler: com.immortalcrab.issue.IssueRequestStreamHandler::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 256
+
+Outputs:
+  CfdiIssueFunc:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt CfdiIssueFunc.Arn
+  CfdiIssueFuncIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt CfdiIssueFuncRole.Arn
