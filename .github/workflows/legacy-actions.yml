@@ -15,11 +15,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Test NumberToSpanishTranslator
-        working-directory: ${{env.e-invoice-dir}}/service/utils
+      - name: Test heat's jars
+        working-directory: ${{env.e-invoice-dir}}/service/heat
         run: |
-          #
-          mvn clean && mvn test
+          # It implicitly carries out compilation
+          mvn test
       - name: Provision DynamoDB
         run: |
           # make file runnable, might not be necessary
