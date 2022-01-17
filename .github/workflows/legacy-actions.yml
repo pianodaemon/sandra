@@ -1,4 +1,4 @@
-name: Java CI
+name: Sandra CI
 
 on: [push]
 
@@ -15,11 +15,21 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Test heat's jars
+      - name: Compile java code of heat
         working-directory: ${{env.e-invoice-dir}}/service/heat
         run: |
-          # It implicitly carries out compilation
-          mvn test
+          # Generates all .class stuff
+          mvn compile  
+      - name: Package lambda to issue cfdi
+        working-directory: ${{env.e-invoice-dir}}/service/issue
+        run: |
+          # shaded artifact
+          mvn package shade:shade
+      - name: Package and Test java code of heat jars
+        working-directory: ${{env.e-invoice-dir}}/service/misc-utils
+        run: |
+          # It implicitly carries out compilation if needed
+          mvn package
       - name: Provision DynamoDB
         run: |
           # make file runnable, might not be necessary
