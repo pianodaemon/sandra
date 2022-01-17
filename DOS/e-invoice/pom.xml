@@ -5,11 +5,11 @@
     <artifactId>workclock</artifactId>
     <version>SANDRA</version>
     <packaging>pom</packaging>
-    <name>heat</name>
+    <name>e-invoice</name>
     <modules>
-        <module>./qrcode</module>
-        <module>./cfdi-utils</module>
-        <module>./utils</module>
-        <module>./issue</module>
+        <module>./service/qrcode</module>
+        <module>./service/cfdi-utils</module>
+        <module>./service/utils</module>
+        <module>./service/issue</module>
     </modules>
 </project>
