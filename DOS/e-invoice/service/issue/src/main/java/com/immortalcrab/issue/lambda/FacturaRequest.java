@@ -1,4 +1,4 @@
-package com.immortalcrab.issue;
+package com.immortalcrab.issue.lambda;
 
 import com.immortalcrab.issue.engine.CfdiRequest;
 import com.immortalcrab.issue.error.CfdiRequestError;
