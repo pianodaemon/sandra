@@ -1,0 +1,5 @@
+rootProject.name = 'billingocr'
+
+include ':engine'
+include ':elemental'
+

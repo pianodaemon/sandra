@@ -1,0 +1,20 @@
+allprojects {
+
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    dependencies {
+
+        // Use JUnit Jupiter for testing.
+        testImplementation "org.junit.jupiter:junit-jupiter:${junit_jupiter}"
+
+        compileOnly "org.projectlombok:lombok:${lombok_version}"
+        annotationProcessor "org.projectlombok:lombok:${lombok_version}"
+    }
+}
