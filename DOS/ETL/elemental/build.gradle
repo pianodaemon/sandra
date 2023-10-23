@@ -8,5 +8,8 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jackson_version}"
     implementation "net.sourceforge.tess4j:tess4j:${tess4j_version}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4j_version}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4j_version}"
 }
