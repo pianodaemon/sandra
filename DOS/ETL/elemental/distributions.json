@@ -1,0 +1,23 @@
+{
+    "distributions":[
+        {
+            "page" : 1,
+            "sections": [
+                {
+                    "title": "INVOICE_NUM",
+                    "x": 238,
+                    "y": 434,
+                    "width": 936,
+                    "height": 38
+                },
+                {
+                    "title": "SHIP_TO_ADDR",
+                    "x": 1610,
+                    "y": 1055,
+                    "width": 1149,
+                    "height": 106
+		}
+            ]
+        }
+    ]
+}

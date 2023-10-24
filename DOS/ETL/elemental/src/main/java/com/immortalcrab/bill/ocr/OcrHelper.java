@@ -9,18 +9,16 @@ import net.sourceforge.tess4j.TesseractException;
 
 public class OcrHelper {
 
-    private static final int PAGE_DOES_NOT_MATTER = 0;
-
     public static void main(String[] args) {
 
         try {
             var bocr = new BillOcr(RenderPngHelper::transformFromPdf, BillDistribution::obtainFromFile);
             String pdfFilePath = "C:/NOMINATOR/908158-PrecioVenta.pdf";
-            Map<String, Object> syms = bocr.fetchSymbols(pdfFilePath, "distribution.json");
+            Map<String, Object> syms = bocr.fetchSymbols(pdfFilePath, "distributions.json");
             for (String name : syms.keySet()) {
                 String key = name.toString();
                 String value = syms.get(name).toString();
-                System.out.println(key + " " + value);
+                System.out.println(key + ": " + value);
             }
 
         } catch (IOException e) {
