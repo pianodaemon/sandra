@@ -1,16 +1,19 @@
 package com.immortalcrab.bill.ocr;
 
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
+
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
 @AllArgsConstructor
 public class BillOcr {
@@ -60,21 +63,25 @@ public class BillOcr {
             for (BillDistribution.Distribution d : dist.getDistributions()) {
                 if ((d.getPage() == PAGE_DOES_NOT_MATTER) || d.getPage() == pageNumber) {
                     for (var section : d.getSections()) {
-                        final String ocrResult = tesseract.doOCR(new File(paths[idx]), section.getRect());
-                        if (syms.containsKey(section.getTitle())) {
-                            syms.get(section.getTitle()).add(ocrResult);
-                        } else {
-                            syms.put(section.getTitle(), new LinkedList<>() {
-                                {
-                                    add(ocrResult);
-                                }
-                            });
-                        }
+                        applyOcrToImg(syms, tesseract, paths[idx], section.getRect(), section.getTitle());
                     }
                     break;
                 }
             }
         }
         return syms;
+    }
+
+    private static void applyOcrToImg(Map<String, List<String>> syms, ITesseract tesseract, final String imgPath, Rectangle rect, final String title) throws TesseractException {
+        final String ocrResult = tesseract.doOCR(new File(imgPath), rect);
+        if (syms.containsKey(title)) {
+            syms.get(title).add(ocrResult);
+        } else {
+            syms.put(title, new LinkedList<>() {
+                {
+                    add(ocrResult);
+                }
+            });
+        }
     }
 }
