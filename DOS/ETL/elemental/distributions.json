@@ -12,11 +12,39 @@
                 },
                 {
                     "title": "SHIP_TO_ADDR",
-                    "x": 1610,
-                    "y": 1055,
-                    "width": 1149,
-                    "height": 106
-		}
+                    "x": 276,
+                    "y": 1064,
+                    "width": 2501,
+                    "height": 104
+                },
+                {
+                    "title": "FOREIGN_CARRIER",
+                    "x": 1861,
+                    "y": 1293,
+                    "width": 468,
+                    "height": 43
+                },
+                {
+                    "title": "BULTOS",
+                    "x": 252,
+                    "y": 1552,
+                    "width": 348,
+                    "height": 44
+                },
+                {
+                    "title": "SEAL",
+                    "x": 322,
+                    "y": 1514,
+                    "width": 688,
+                    "height": 36
+                },
+                {
+                    "title": "REFERECNCE",
+                    "x": 284,
+                    "y": 1423,
+                    "width": 730,
+                    "height": 43
+                }
             ]
         }
     ]
