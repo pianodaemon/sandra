@@ -23,19 +23,10 @@ public class BillOcr {
     protected final @NonNull
     ITransformer imgTransformer;
 
-    protected final @NonNull
-    IBillDistributionProvider distProvider;
-
     @FunctionalInterface
     public interface ITransformer {
 
         public String[] transformFromFile(final String outputImageDirectory, File file) throws IOException;
-    }
-
-    @FunctionalInterface
-    public interface IBillDistributionProvider {
-
-        public BillDistribution obtainFromFile(String distPath) throws IOException;
     }
 
     private ITesseract setupTesseract() {
@@ -55,7 +46,7 @@ public class BillOcr {
     public Map<String, List<String>> fetchSymbols(String pdfFilePath, String distPath) throws IOException, TesseractException {
         Map<String, List<String>> syms = new HashMap<>();
         ITesseract tesseract = setupTesseract();
-        BillDistribution dist = distProvider.obtainFromFile(distPath);
+        BillDistribution dist = BillDistribution.obtainFromFile(distPath);
         String[] paths = imgTransformer.transformFromFile(null, new File(pdfFilePath));
 
         for (int idx = 0; idx < paths.length; idx++) {

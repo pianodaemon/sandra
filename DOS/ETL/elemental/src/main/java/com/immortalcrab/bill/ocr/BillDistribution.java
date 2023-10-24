@@ -19,7 +19,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class BillDistribution extends JsonToMapHelper {
+class BillDistribution extends JsonToMapHelper {
 
     List<Distribution> mdistributions;
 
@@ -53,6 +53,7 @@ public class BillDistribution extends JsonToMapHelper {
     private List<Section> loadSections(List<Map<String, Object>> sections) {
         List<Section> ss = new LinkedList<>();
         try {
+
             sections.stream().map(i -> {
 
                 Section p = new Section();
