@@ -46,11 +46,32 @@
                     "height": 36
                 },
                 {
-                    "title": "REFERECNCE",
+                    "title": "REFERENCE",
                     "x": 284,
                     "y": 1423,
                     "width": 730,
                     "height": 43
+                },
+                {
+                    "title": "MERC_DESC",
+                    "x": 105,
+                    "y": 1907,
+                    "width": 807,
+                    "height": 508
+                },
+                {
+                    "title": "MERC_WEIGHT",
+                    "x": 1711,
+                    "y": 1907,
+                    "width": 338,
+                    "height": 508
+                },
+                {
+                    "title": "MERC_QUANTITY",
+                    "x": 2069,
+                    "y": 1907,
+                    "width": 322,
+                    "height": 508
                 }
             ]
         }
