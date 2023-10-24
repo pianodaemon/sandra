@@ -2,6 +2,7 @@ package com.immortalcrab.bill.ocr;
 
 import com.immortalcrab.bill.pdf.RenderPngHelper;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,11 +15,13 @@ public class OcrHelper {
         try {
             var bocr = new BillOcr(RenderPngHelper::transformFromPdf, BillDistribution::obtainFromFile);
             String pdfFilePath = "C:/NOMINATOR/908158-PrecioVenta.pdf";
-            Map<String, Object> syms = bocr.fetchSymbols(pdfFilePath, "distributions.json");
+            Map<String, List<String>> syms = bocr.fetchSymbols(pdfFilePath, "distributions.json");
             for (String name : syms.keySet()) {
-                String key = name.toString();
-                String value = syms.get(name).toString();
-                System.out.println(key + ": " + value);
+                String key = name;
+                System.out.print(key + ": ");
+                for (var text : syms.get(name)) {
+                    System.out.print("[" + text + "]");
+                }
             }
 
         } catch (IOException e) {
