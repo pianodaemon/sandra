@@ -52,14 +52,21 @@ public class BillOcr {
         ITesseract tesseract = setupTesseract();
         BillDistribution dist = distProvider.obtainFromFile(distPath);
         String[] paths = imgTransformer.transformFromFile(null, new File(pdfFilePath));
+
         for (int idx = 0; idx < paths.length; idx++) {
             final int pageNumber = idx + 1;
             for (BillDistribution.Distribution d : dist.getDistributions()) {
-                if ((d.getPage() == PAGE_DOES_NOT_MATTER) || (d.getPage() == pageNumber)) {
+                if ((d.getPage() == PAGE_DOES_NOT_MATTER) || d.getPage() == pageNumber) {
                     for (var section : d.getSections()) {
                         final String ocrResult = tesseract.doOCR(new File(paths[idx]), section.getRect());
-                        syms.put(section.getTitle(), ocrResult);
+                        if (syms.containsKey(section.getTitle())) {
+                            String acumulated = syms.get(section.getTitle()) + ocrResult;
+                            syms.put(section.getTitle(), acumulated);
+                        } else {
+                            syms.put(section.getTitle(), ocrResult);
+                        }
                     }
+                    break;
                 }
             }
         }
