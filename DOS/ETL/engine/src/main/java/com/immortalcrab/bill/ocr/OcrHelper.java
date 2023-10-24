@@ -13,8 +13,8 @@ public class OcrHelper {
     public static void main(String[] args) {
 
         try {
-            var bocr = new BillOcr(RenderPngHelper::transformFromPdf, BillDistribution::obtainFromFile);
-            String pdfFilePath = "C:/NOMINATOR/908158-PrecioVenta.pdf";
+            var bocr = new BillOcr(RenderPngHelper::transformFromPdf);
+            String pdfFilePath = "C:\\Users\\Edwin Plauchu\\Downloads\\xxxxx\\907347-PrecioVenta.pdf";
             Map<String, List<String>> syms = bocr.fetchSymbols(pdfFilePath, "distributions.json");
             for (String name : syms.keySet()) {
                 String key = name;
