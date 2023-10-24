@@ -2,6 +2,8 @@ package com.immortalcrab.bill.ocr;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -47,8 +49,8 @@ public class BillOcr {
         return tesseract;
     }
 
-    public Map<String, Object> fetchSymbols(String pdfFilePath, String distPath) throws IOException, TesseractException {
-        Map<String, Object> syms = new HashMap<>();
+    public Map<String, List<String>> fetchSymbols(String pdfFilePath, String distPath) throws IOException, TesseractException {
+        Map<String, List<String>> syms = new HashMap<>();
         ITesseract tesseract = setupTesseract();
         BillDistribution dist = distProvider.obtainFromFile(distPath);
         String[] paths = imgTransformer.transformFromFile(null, new File(pdfFilePath));
@@ -60,10 +62,13 @@ public class BillOcr {
                     for (var section : d.getSections()) {
                         final String ocrResult = tesseract.doOCR(new File(paths[idx]), section.getRect());
                         if (syms.containsKey(section.getTitle())) {
-                            String acumulated = syms.get(section.getTitle()) + ocrResult;
-                            syms.put(section.getTitle(), acumulated);
+                            syms.get(section.getTitle()).add(ocrResult);
                         } else {
-                            syms.put(section.getTitle(), ocrResult);
+                            syms.put(section.getTitle(), new LinkedList<>() {
+                                {
+                                    add(ocrResult);
+                                }
+                            });
                         }
                     }
                     break;
