@@ -14,6 +14,10 @@ subprojects {
         // Use JUnit Jupiter for testing.
         testImplementation "org.junit.jupiter:junit-jupiter:${junit_jupiter}"
 
+        implementation "net.sourceforge.tess4j:tess4j:${tess4j_version}"
+        implementation "org.apache.logging.log4j:log4j-core:${log4j_version}"
+        implementation "org.apache.logging.log4j:log4j-api:${log4j_version}"
+
         compileOnly "org.projectlombok:lombok:${lombok_version}"
         annotationProcessor "org.projectlombok:lombok:${lombok_version}"
     }

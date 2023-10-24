@@ -1,1 +1,11 @@
 description = 'engine'
+apply plugin: 'application'
+mainClassName = 'com.immortalcrab.bill.ocr.OcrHelper'
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+dependencies {
+
+    implementation project(':elemental')
+}
