@@ -1,18 +1,30 @@
 package com.immortalcrab.bill.struct;
 
+import java.util.LinkedList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 class Merchandise {
 
-    private String partNumber;
-    private String description;
-    private List<String> serialNumber;
+    private @NonNull
+    String partNumber;
+
+    private @NonNull
+    String description;
+
+    private @NonNull
+    List<String> serialNumber;
+
+    public static Merchandise inceptWithEmptyValues() {
+        return new Merchandise("", "", new LinkedList<>());
+    }
 
     @Override
     public String toString() {
