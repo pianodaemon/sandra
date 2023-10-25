@@ -1,9 +1,8 @@
 package com.immortalcrab.bill.ocr;
 
+import com.immortalcrab.bill.struct.ExpCommercial;
 import com.immortalcrab.bill.pdf.RenderPngHelper;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.tess4j.TesseractException;
@@ -15,14 +14,10 @@ public class OcrHelper {
         try {
             var bocr = new BillOcr(RenderPngHelper::transformFromPdf);
             String pdfFilePath = "C:\\Users\\Edwin Plauchu\\Downloads\\xxxxx\\907347-PrecioVenta.pdf";
-            Map<String, List<String>> syms = bocr.fetchSymbols(pdfFilePath, "distributions.json");
-            for (String name : syms.keySet()) {
-                String key = name;
-                System.out.print(key + ": ");
-                for (var text : syms.get(name)) {
-                    System.out.print("[" + text + "]");
-                }
-            }
+            String profileDirPath = ".";
+            ExpCommercial invoice = new ExpCommercial(profileDirPath, (distPath) -> bocr.fetchSymbols(pdfFilePath, distPath));
+
+            invoice.structureData();
 
         } catch (IOException e) {
             e.printStackTrace();
