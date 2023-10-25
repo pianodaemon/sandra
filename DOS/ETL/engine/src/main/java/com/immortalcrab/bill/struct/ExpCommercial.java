@@ -122,9 +122,8 @@ public class ExpCommercial {
             var lineCorrected = removeNewLines(lines[idx]);
             switch (state) {
                 case PARTNUM:
-                    m = new Merchandise();
+                    m = Merchandise.inceptWithEmptyValues();
                     m.setPartNumber(lineCorrected);
-                    m.setSerialNumber(new LinkedList<String>());
                     state = Pickup.DESCRIPTION;
                     break;
                 case DESCRIPTION:
@@ -133,7 +132,7 @@ public class ExpCommercial {
                         listMercs.add(m);
                         continue;
                     }
-                    if (m.getDescription() == null) {
+                    if (m.getDescription().isBlank()) {
                         m.setDescription(lineCorrected.trim());
                     } else {
                         if (lineCorrected.startsWith(SERIAL_NUMBER_COLON)) {
