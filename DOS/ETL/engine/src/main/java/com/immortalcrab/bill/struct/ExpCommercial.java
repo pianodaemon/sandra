@@ -18,6 +18,10 @@ import lombok.AllArgsConstructor;
 public class ExpCommercial {
 
     private static final String DIST_FILE = "export_commercial_invoice.json";
+    private static final String SYM_MERC_DESC = "MERC_DESC";
+    private static final String SYM_MERC_DESC_PILOT = "MERC_DESC_PILOT";
+    private static final String SYM_MERC_WEIGHT = "MERC_WEIGHT";
+    private static final String SYM_MERC_QUANTITY = "MERC_QUANTITY";
     private static final String SYM_INVOICE_NUM = "INVOICE_NUM";
     private static final String SYM_BULTOS = "BULTOS";
     private static final String SYM_CON_ECO_NUM = "CON_ECO_NUM";
@@ -45,9 +49,9 @@ public class ExpCommercial {
     public void structureData() throws IOException, TesseractException {
         Map<String, List<String>> syms = symProvider.fetchSymbols(resolveDistributionPath());
         Map<String, Object> corrections = new HashMap<>();
-        corrections.put("MERC_DESC", parseMercsBuffers(syms.get("MERC_DESC"), syms.get("MERC_DESC_PILOT")));
-        corrections.put("MERC_WEIGHT", sublistWithoutLast(groomBuffers(syms.get("MERC_WEIGHT"))));
-        corrections.put("MERC_QUANTITY", groomBuffers(syms.get("MERC_QUANTITY")));
+        corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
+        corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
+        corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
 
         String[] names = {
             SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM,
@@ -79,7 +83,7 @@ public class ExpCommercial {
         return particles;
     }
 
-    enum Pickup {
+    private enum Pickup {
         PARTNUM,
         DESCRIPTION,
         SERIAL
