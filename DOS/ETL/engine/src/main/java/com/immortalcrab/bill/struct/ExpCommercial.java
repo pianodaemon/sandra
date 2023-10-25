@@ -119,48 +119,43 @@ public class ExpCommercial {
     private static void extractMercsFromBuffer(List<Merchandise> listMercs, String bufferA, String bufferB) {
         Set<Integer> pilots = seekOutPilots(bufferA, bufferB);
         String[] lines = removeEmpties(bufferA.split("\n"));
-        Merchandise m = null;
+        Merchandise merchandise = null;
         Pickup state = Pickup.PARTNUM;
         int idx = 0;
         while (idx < lines.length) {
             var lineCorrected = removeNewLines(lines[idx]);
             switch (state) {
                 case PARTNUM:
-                    m = Merchandise.inceptWithEmptyValues();
-                    m.setPartNumber(lineCorrected);
+                    merchandise = Merchandise.make();
+                    merchandise.setPartNumber(lineCorrected);
                     state = Pickup.DESCRIPTION;
                     break;
                 case DESCRIPTION:
                     if (pilots.contains(idx)) {
                         state = Pickup.PARTNUM;
-                        listMercs.add(m);
+                        listMercs.add(merchandise);
                         continue;
                     }
-                    if (m.getDescription().isBlank()) {
-                        m.setDescription(lineCorrected.trim());
+                    if (lineCorrected.startsWith(SERIAL_NUMBER_COLON)) {
+                        state = Pickup.SERIAL;
+                        continue;
                     } else {
-                        if (lineCorrected.startsWith(SERIAL_NUMBER_COLON)) {
-                            state = Pickup.SERIAL;
-                            continue;
-                        } else {
-                            m.setDescription(m.getDescription() + lineCorrected);
-                        }
-
+                        merchandise.setDescription(merchandise.getDescription() + lineCorrected);
                     }
                     break;
                 case SERIAL:
                     if (pilots.contains(idx)) {
                         state = Pickup.PARTNUM;
-                        listMercs.add(m);
+                        listMercs.add(merchandise);
                         continue;
                     }
                     if (lineCorrected.startsWith(SERIAL_NUMBER_COLON)) {
-                        var serials = m.getSerialNumber();
+                        var serials = merchandise.getSerialNumbers();
                         serials.add(lineCorrected.replace(SERIAL_NUMBER_COLON, "").trim());
-                        m.setSerialNumber(serials);
+                        merchandise.setSerialNumbers(serials);
                         // Special case when there is no more lines to parse 
                         if (idx == (lines.length - 1)) {
-                            listMercs.add(m);
+                            listMercs.add(merchandise);
                         }
                     }
                     break;
