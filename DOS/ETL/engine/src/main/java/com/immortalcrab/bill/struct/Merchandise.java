@@ -20,15 +20,15 @@ class Merchandise {
     String description;
 
     private @NonNull
-    List<String> serialNumber;
+    List<String> serialNumbers;
 
-    public static Merchandise inceptWithEmptyValues() {
+    public static Merchandise make() {
         return new Merchandise("", "", new LinkedList<>());
     }
 
     @Override
     public String toString() {
         return "Merchandise [partNumber=" + partNumber + ", description=" + description
-                + ", serialNumber=" + serialNumber + "]";
+                + ", serialNumber=" + serialNumbers + "]";
     }
 }
