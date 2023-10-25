@@ -84,38 +84,76 @@ public class ExpCommercial {
         return particles;
     }
 
+    enum Pickup {
+        PARTNUM,
+        DESCRIPTION,
+        SERIAL
+    }
+
     private List<Merchandise> parseBufferDesc(List<String> buffers) {
         var particles = new LinkedList<Merchandise>();
         for (var buffer : buffers) {
             String[] lines = removeEmpties(buffer.split("\n"));
             Merchandise m = null;
-            for (int idx = 0; idx < lines.length; idx++) {
-                if ((idx % 4) == 0) {
-                    m = new Merchandise();
-                    var pn = removeNewLines(lines[idx]);
-                    m.setPartNumber(pn);
-                }
-                if ((idx % 4) == 1) {
-                    var pn = removeNewLines(lines[idx]);
-                    m.setDescription(pn);
-                }
-                if ((idx % 4) == 2) {
-                    var pn = removeNewLines(lines[idx]);
-                    m.setDescription(m.getDescription() + pn);
-                }
-                if ((idx % 4) == 3) {
-                    var pn = removeNewLines(lines[idx]);
-                    if (pn.startsWith("Serial Number:")) {
-                        m.setSerialNumber(pn.replace("Serial Number:", ""));
-                    } else {
-                        m.setDescription(m.getDescription() + pn);
-                        m.setSerialNumber("NA");
-                    }
-                    particles.add(m);
-                }
-            }
+            Pickup state = Pickup.PARTNUM;
+            int idx = 0;
+            short auxCounter = 0;
+            while (idx < lines.length) {
+                var lineCorrected = removeNewLines(lines[idx]);
+                switch (state) {
+                    case PARTNUM:
+                        auxCounter = 0;
+                        m = new Merchandise();
+                        m.setPartNumber(lineCorrected);
+                        m.setSerialNumber(new LinkedList<String>());
+                        state = Pickup.DESCRIPTION;
+                        break;
+                    case DESCRIPTION:
+                        if (auxCounter == 0) {
+                            m.setDescription(lineCorrected);
+                        }
 
+                        if (auxCounter == 1) {
+                            m.setDescription(m.getDescription() + lineCorrected);
+                        }
+
+                        if (auxCounter == 2) {
+                            if (lineCorrected.startsWith("Serial Number:")) {
+                                state = Pickup.SERIAL;
+                                continue;
+                            } else {
+                                m.setDescription(m.getDescription() + lineCorrected);
+                                var serials = m.getSerialNumber();
+                                serials.add("NA");
+                                m.setSerialNumber(serials);
+                            }
+                            particles.add(m);
+                            state = Pickup.PARTNUM;
+                        }
+
+                        auxCounter++;
+                        break;
+                    case SERIAL:
+                        if (lineCorrected.startsWith("Serial Number:")) {
+                            var serials = m.getSerialNumber();
+                            serials.add(lineCorrected.replace("Serial Number:", ""));
+                            m.setSerialNumber(serials);
+                            // Special case when there is no more lines to parse 
+                            if (idx == (lines.length - 1)) {
+                                particles.add(m);
+                            }
+                        } else {
+                            particles.add(m);
+                            state = Pickup.PARTNUM;
+                            continue;
+                        }
+                        break;
+                }
+
+                idx++;
+            }
         }
+
         return particles;
     }
 
