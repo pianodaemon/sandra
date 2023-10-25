@@ -90,6 +90,31 @@ public class ExpCommercial {
         SERIAL
     }
 
+    private static int[] seekOutPilots(String bufferA, String bufferB) {
+        String[] a = removeEmpties(bufferA.split("\n"));
+        String[] b = removeEmpties(bufferB.split("\n"));
+
+        var pilots = new LinkedList<Integer>();
+        int i = 0;
+        int j = 0;
+        do {
+            if (a[i].equals(b[j])) {
+                i++;
+            } else {
+                pilots.add(i - 1);
+            }
+            j++;
+        } while (j < b.length);
+
+        int[] pilotsArray = new int[pilots.size()];
+
+        for (int idx = 0; idx < pilotsArray.length; idx++) {
+            pilotsArray[idx] = pilots.get(idx);
+        }
+
+        return pilotsArray;
+    }
+
     private List<Merchandise> parseBufferDesc(List<String> buffers) {
         var particles = new LinkedList<Merchandise>();
         for (var buffer : buffers) {
