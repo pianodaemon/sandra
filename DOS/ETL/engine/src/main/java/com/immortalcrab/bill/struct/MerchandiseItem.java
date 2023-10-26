@@ -3,14 +3,17 @@ package com.immortalcrab.bill.struct;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Setter
 @AllArgsConstructor
-class Merchandise {
+class MerchandiseItem {
 
     private String partNumber;
     private String description;
+
+    @NonNull
     private List<String> serialNumbers;
 
     public Optional<String> getPartNumber() {
@@ -27,7 +30,7 @@ class Merchandise {
 
     @Override
     public String toString() {
-        return "Merchandise [partNumber=" + partNumber + ", description=" + description
+        return "MerchandiseItem [partNumber=" + partNumber + ", description=" + description
                 + ", serialNumber=" + serialNumbers + "]";
     }
 }

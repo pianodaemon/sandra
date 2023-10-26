@@ -98,7 +98,7 @@ public class ExpCommercial {
 
         Element merchandiseElement = doc.createElement("Merchandise");
         invoiceElement.appendChild(merchandiseElement);
-        var mercs = (List<Merchandise>) corrections.get(SYM_MERC_DESC);
+        var mercs = (List<MerchandiseItem>) corrections.get(SYM_MERC_DESC);
         var quantity = (List<String>) corrections.get(SYM_MERC_QUANTITY);
         var weights = (List<String>) corrections.get(SYM_MERC_WEIGHT);
         for (int idx = 0; idx < mercs.size(); idx++) {
@@ -162,28 +162,28 @@ public class ExpCommercial {
         return pilots;
     }
 
-    private List<Merchandise> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
+    private List<MerchandiseItem> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
         if (buffers.size() != primes.size()) {
             throw new InvoiceOcrException("Original and Prime buffers must feature equal size", ErrorCodes.INVALID_INPUT_TO_PARSE);
         }
-        var listMercs = new LinkedList<Merchandise>();
+        var listMercs = new LinkedList<MerchandiseItem>();
         for (int buffIdx = 0; buffIdx < buffers.size(); buffIdx++) {
             extractMercsFromBuffer(listMercs, buffers.get(buffIdx), primes.get(buffIdx));
         }
         return listMercs;
     }
 
-    private static void extractMercsFromBuffer(List<Merchandise> listMercs, String bufferA, String bufferB) {
+    private static void extractMercsFromBuffer(List<MerchandiseItem> listMercs, String bufferA, String bufferB) {
         Set<Integer> pilots = seekOutPilots(bufferA, bufferB);
         String[] lines = removeEmpties(bufferA.split("\n"));
-        Merchandise merchandise = null;
+        MerchandiseItem merchandise = null;
         Pickup state = Pickup.PARTNUM;
         int idx = 0;
         while (idx < lines.length) {
             var lineCorrected = removeNewLines(lines[idx]);
             switch (state) {
                 case PARTNUM:
-                    merchandise = new Merchandise(lineCorrected, null, new LinkedList<>());
+                    merchandise = new MerchandiseItem(lineCorrected, null, new LinkedList<>());
                     state = Pickup.DESCRIPTION;
                     break;
                 case DESCRIPTION:
