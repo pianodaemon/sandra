@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.math.BigDecimal;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,6 +23,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ExpCommercial {
 
+    private static final BigDecimal FACTOR_KILOGRAM_TO_POUND = new BigDecimal("2.20462");
     private static final String DIST_FILE = "export_commercial_invoice.json";
     private static final String SYM_MERC_DESC = "MERC_DESC";
     private static final String SYM_MERC_DESC_PILOT = "MERC_DESC_PILOT";
@@ -71,7 +73,13 @@ public class ExpCommercial {
         return genXmlFromCorrections(corrections);
     }
 
-    private Document genXmlFromCorrections(Map<String, Object> corrections) throws ParserConfigurationException {
+    private static BigDecimal removeCommasFromStrMagnitude(final String numberWithCommas) {
+
+        String numberWithoutCommas = numberWithCommas.replace(",", "");
+        return new BigDecimal(numberWithoutCommas);
+    }
+
+    private static Document genXmlFromCorrections(Map<String, Object> corrections) throws ParserConfigurationException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
@@ -97,7 +105,10 @@ public class ExpCommercial {
             itemElement.setAttribute("partNumber", item.getPartNumber().orElseThrow());
             itemElement.setAttribute("description", item.getDescription().orElseThrow());
             itemElement.setAttribute("quantity", quantity.get(idx));
-            itemElement.setAttribute("weight", weights.get(idx));
+            BigDecimal kgs = removeCommasFromStrMagnitude(weights.get(idx));
+            itemElement.setAttribute("weightAsKilograms", kgs.toPlainString());
+            BigDecimal pounds = removeCommasFromStrMagnitude(weights.get(idx)).multiply(FACTOR_KILOGRAM_TO_POUND);
+            itemElement.setAttribute("weightAsPounds", pounds.toPlainString());
             merchandiseElement.appendChild(itemElement);
 
             if (!item.getSerialNumbers().isEmpty()) {
@@ -236,4 +247,3 @@ public class ExpCommercial {
         return resultArray;
     }
 }
-
