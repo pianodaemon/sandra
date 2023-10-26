@@ -126,7 +126,7 @@ public class ExpCommercial {
             var lineCorrected = removeNewLines(lines[idx]);
             switch (state) {
                 case PARTNUM:
-                    merchandise = Merchandise.make();
+                    merchandise = new Merchandise(null, null, new LinkedList<>());
                     merchandise.setPartNumber(lineCorrected);
                     state = Pickup.DESCRIPTION;
                     break;
@@ -140,7 +140,8 @@ public class ExpCommercial {
                         state = Pickup.SERIAL;
                         continue;
                     } else {
-                        merchandise.setDescription(merchandise.getDescription() + lineCorrected);
+                        var desc = merchandise.getDescription().orElse("") + " " + lineCorrected;
+                        merchandise.setDescription(desc.trim());
                     }
                     break;
                 case SERIAL:
