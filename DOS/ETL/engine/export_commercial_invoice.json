@@ -53,6 +53,13 @@
                     "height":43
                 },
                 {
+                    "title":"MERC_DESC_PILOT",
+                    "x":98,
+                    "y":1902,
+                    "width":1027,
+                    "height":508
+                },
+                {
                     "title":"MERC_DESC",
                     "x":98,
                     "y":1902,
@@ -78,6 +85,13 @@
         {
             "page":0,
             "sections":[
+                {
+                    "title":"MERC_DESC_PILOT",
+                    "x":98,
+                    "y":302,
+                    "width":1027,
+                    "height":2248
+                },
                 {
                     "title":"MERC_DESC",
                     "x":98,
