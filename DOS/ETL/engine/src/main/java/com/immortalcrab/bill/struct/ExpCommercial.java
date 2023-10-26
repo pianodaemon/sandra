@@ -9,6 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import net.sourceforge.tess4j.TesseractException;
 
@@ -46,7 +51,7 @@ public class ExpCommercial {
         return rootPath.resolve(partialPath).toString();
     }
 
-    public void structureData() throws IOException, TesseractException {
+    public Document structureData() throws IOException, TesseractException, ParserConfigurationException {
         Map<String, List<String>> syms = symProvider.fetchSymbols(resolveDistributionPath());
         Map<String, Object> corrections = new HashMap<>();
         corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
@@ -63,11 +68,49 @@ public class ExpCommercial {
             corrections.put(name, removeNewLines(firstElement));
         }
 
-        for (var key : corrections.keySet()) {
-            var p = key + ": " + corrections.get(key).toString();
-            System.out.println(p);
-        }
+        return genXmlFromCorrections(corrections);
+    }
 
+    private Document genXmlFromCorrections(Map<String, Object> corrections) throws ParserConfigurationException {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+
+        Element invoiceElement = doc.createElement("Invoice");
+        invoiceElement.setAttribute("invoiceNum", (String) corrections.get(SYM_INVOICE_NUM));
+        invoiceElement.setAttribute("shipToAddr", (String) corrections.get(SYM_SHIP_TO_ADDR));
+        invoiceElement.setAttribute("foreignCarrier", (String) corrections.get(SYM_FOREIGN_CARRIER));
+        invoiceElement.setAttribute("ref", (String) corrections.get(SYM_REFERENCE));
+        invoiceElement.setAttribute("bultos", (String) corrections.get(SYM_BULTOS));
+        invoiceElement.setAttribute("seal", (String) corrections.get(SYM_SEAL));
+        invoiceElement.setAttribute("conEcoNum", (String) corrections.get(SYM_CON_ECO_NUM));
+        doc.appendChild(invoiceElement);
+
+        Element merchandiseElement = doc.createElement("Merchandise");
+        invoiceElement.appendChild(merchandiseElement);
+        var mercs = (List<Merchandise>) corrections.get(SYM_MERC_DESC);
+        var quantity = (List<String>) corrections.get(SYM_MERC_QUANTITY);
+        var weights = (List<String>) corrections.get(SYM_MERC_WEIGHT);
+        for (int idx = 0; idx < mercs.size(); idx++) {
+            var item = mercs.get(idx);
+            Element itemElement = doc.createElement("Item");
+            itemElement.setAttribute("partNumber", item.getPartNumber().orElseThrow());
+            itemElement.setAttribute("description", item.getDescription().orElseThrow());
+            itemElement.setAttribute("quantity", quantity.get(idx));
+            itemElement.setAttribute("weight", weights.get(idx));
+            merchandiseElement.appendChild(itemElement);
+
+            if (!item.getSerialNumbers().isEmpty()) {
+                Element serialsElement = doc.createElement("Serials");
+                itemElement.appendChild(serialsElement);
+                for (var serial : item.getSerialNumbers()) {
+                    Element serialElement = doc.createElement("Serial");
+                    serialElement.setAttribute("alpha", serial);
+                    serialsElement.appendChild(serialElement);
+                }
+            }
+        }
+        return doc;
     }
 
     private static List<String> groomBuffers(List<String> buffers) {
@@ -183,7 +226,6 @@ public class ExpCommercial {
 
         String[] resultArray = new String[nonEmptyCount];
         int index = 0;
-
         for (String str : inputArray) {
             if (!str.isEmpty() && !str.trim().isEmpty()) {
                 resultArray[index] = str;
@@ -194,3 +236,4 @@ public class ExpCommercial {
         return resultArray;
     }
 }
+
