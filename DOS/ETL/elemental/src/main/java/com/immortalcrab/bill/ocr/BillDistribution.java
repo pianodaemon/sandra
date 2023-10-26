@@ -50,7 +50,7 @@ class BillDistribution extends JsonToMapHelper {
                 return p;
             }).forEachOrdered(mdistributions::add);
         } catch (NoSuchElementException ex) {
-            final String emsg = "One or more of sections might contain missing elements";
+            final String emsg = "One or more sections might contain missing elements";
             throw new InvoiceOcrException(emsg, ex);
         }
     }

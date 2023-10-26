@@ -19,8 +19,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RenderPngHelper {
 
-    private static String IMAGE_EXT = "png";
-    private static String DEFAULT_OUTPUT_IMAGE_DIR = "outputImages";
+    private static final String IMAGE_EXT = "png";
+    private static final String DEFAULT_OUTPUT_IMAGE_DIR = "outputImages";
 
     private final String outputImageDirectory;
     private final InputStream inputStream;
@@ -44,12 +44,10 @@ public class RenderPngHelper {
     }
 
     public String[] snapshotForEachPage(final String title) throws IOException {
-
         File directory = new File(outputImageDirectory);
         if (!directory.exists()) {
             directory.mkdir();
         }
-
         try ( PDDocument document = PDDocument.load(inputStream)) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
             return renderPages(pdfRenderer, title, document.getNumberOfPages());
