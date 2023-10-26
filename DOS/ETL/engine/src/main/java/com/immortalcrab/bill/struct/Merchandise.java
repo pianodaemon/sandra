@@ -1,29 +1,28 @@
 package com.immortalcrab.bill.struct;
 
-import java.util.LinkedList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Setter
+@AllArgsConstructor
 class Merchandise {
 
-    private @NonNull
-    String partNumber;
+    private String partNumber;
+    private String description;
+    private List<String> serialNumbers;
 
-    private @NonNull
-    String description;
+    public Optional<String> getPartNumber() {
+        return Optional.ofNullable(partNumber);
+    }
 
-    private @NonNull
-    List<String> serialNumbers;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
 
-    public static Merchandise make() {
-        return new Merchandise("", "", new LinkedList<>());
+    public List<String> getSerialNumbers() {
+        return serialNumbers;
     }
 
     @Override
