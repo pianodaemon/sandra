@@ -21,58 +21,55 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 class BillDistribution extends JsonToMapHelper {
 
-    List<Distribution> mdistributions;
+    private final List<Distribution> mdistributions;
 
-    public static BillDistribution obtainFromFile(String distPath) throws IOException {
+    public static BillDistribution obtainFromFile(String distPath) throws InvoiceOcrException {
         return obtainFromFile(new File(distPath));
     }
 
-    public static BillDistribution obtainFromFile(File distFile) throws IOException {
-        InputStreamReader distIsr = new InputStreamReader(new FileInputStream(distFile));
-        return new BillDistribution(distIsr);
+    public static BillDistribution obtainFromFile(File distFile) throws InvoiceOcrException {
+        InputStreamReader distIsr;
+        try {
+            distIsr = new InputStreamReader(new FileInputStream(distFile));
+            return new BillDistribution(distIsr);
+        } catch (IOException ex) {
+            final String emsg = "Distribution file is not available as needed";
+            throw new InvoiceOcrException(emsg, ex);
+        }
     }
 
-    private BillDistribution(InputStreamReader reader) throws IOException {
+    private BillDistribution(InputStreamReader reader) throws InvoiceOcrException, IOException {
         super(JsonToMapHelper.readFromReader(reader));
-        loadDistributions();
-    }
-
-    private void loadDistributions() {
         mdistributions = new LinkedList<>();
-        List<Map<String, Object>> distributions = LegoAssembler.obtainObjFromKey(this.getDs(), "distributions");
-        distributions.stream().map(d -> {
-            Distribution p = new Distribution();
-            p.setPage(LegoAssembler.obtainObjFromKey(d, "page"));
-            p.setSections(loadSections(LegoAssembler.obtainObjFromKey(d, "sections")));
-            return p;
-        }).forEachOrdered(p -> {
-            mdistributions.add(p);
-        });
+        try {
+            List<Map<String, Object>> distributions = LegoAssembler.obtainObjFromKey(this.getDs(), "distributions");
+            distributions.stream().map(d -> {
+                Distribution p = new Distribution();
+                p.setPage(LegoAssembler.obtainObjFromKey(d, "page"));
+                p.setSections(loadSections(LegoAssembler.obtainObjFromKey(d, "sections")));
+                return p;
+            }).forEachOrdered(mdistributions::add);
+        } catch (NoSuchElementException ex) {
+            final String emsg = "One or more of sections might contain missing elements";
+            throw new InvoiceOcrException(emsg, ex);
+        }
     }
 
     private List<Section> loadSections(List<Map<String, Object>> sections) {
         List<Section> ss = new LinkedList<>();
-        try {
+        sections.stream().map(i -> {
+            Section p = new Section();
+            p.setTitle(LegoAssembler.obtainObjFromKey(i, "title"));
 
-            sections.stream().map(i -> {
-
-                Section p = new Section();
-                p.setTitle(LegoAssembler.obtainObjFromKey(i, "title"));
-
-                var rect = new Rectangle(
-                        LegoAssembler.obtainObjFromKey(i, "x"),
-                        LegoAssembler.obtainObjFromKey(i, "y"),
-                        LegoAssembler.obtainObjFromKey(i, "width"),
-                        LegoAssembler.obtainObjFromKey(i, "height")
-                );
-                p.setRect(rect);
-                return p;
-            }).forEachOrdered(p -> {
-                ss.add(p);
-            });
-        } catch (NoSuchElementException ex) {
-            log.error("One or more of section might contain typos");
-        }
+            var rect = new Rectangle(
+                    LegoAssembler.obtainObjFromKey(i, "x"),
+                    LegoAssembler.obtainObjFromKey(i, "y"),
+                    LegoAssembler.obtainObjFromKey(i, "width"),
+                    LegoAssembler.obtainObjFromKey(i, "height")
+            );
+            p.setRect(rect);
+            return p;
+        }).forEachOrdered(ss::add);
         return ss;
     }
 
