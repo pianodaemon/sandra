@@ -1,8 +1,9 @@
 package com.immortalcrab.bill.struct;
 
+import com.immortalcrab.bill.ocr.ErrorCodes;
+import com.immortalcrab.bill.ocr.InvoiceOcrException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -16,7 +17,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import net.sourceforge.tess4j.TesseractException;
 
 import lombok.AllArgsConstructor;
 
@@ -44,7 +44,7 @@ public class ExpCommercial {
     @FunctionalInterface
     public interface ISymbolProvider {
 
-        public Map<String, List<String>> fetchSymbols(String distPath) throws IOException, TesseractException;
+        public Map<String, List<String>> fetchSymbols(String distPath) throws InvoiceOcrException;
     }
 
     private String resolveDistributionPath() {
@@ -53,28 +53,30 @@ public class ExpCommercial {
         return rootPath.resolve(partialPath).toString();
     }
 
-    public Document structureData() throws IOException, TesseractException, ParserConfigurationException {
-        Map<String, List<String>> syms = symProvider.fetchSymbols(resolveDistributionPath());
-        Map<String, Object> corrections = new HashMap<>();
-        corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
-        corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
-        corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
-
-        String[] names = {
-            SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM,
-            SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL, SYM_SHIP_TO_ADDR
-        };
-        for (String name : names) {
-            var buffers = syms.get(name);
-            final String firstElement = buffers.get(0);
-            corrections.put(name, removeNewLines(firstElement));
+    public Document structureData() throws InvoiceOcrException {
+        try {
+            Map<String, List<String>> syms = symProvider.fetchSymbols(resolveDistributionPath());
+            Map<String, Object> corrections = new HashMap<>();
+            corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
+            corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
+            corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
+            String[] names = {
+                SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM,
+                SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL, SYM_SHIP_TO_ADDR
+            };
+            for (String name : names) {
+                var buffers = syms.get(name);
+                final String firstElement = buffers.get(0);
+                corrections.put(name, removeNewLines(firstElement));
+            }
+            return genXmlFromCorrections(corrections);
+        } catch (ParserConfigurationException ex) {
+            final String emsg = "The xml document containing the symbols can not be rendered";
+            throw new InvoiceOcrException(emsg, ex, ErrorCodes.XML_RENDER_ISSUE);
         }
-
-        return genXmlFromCorrections(corrections);
     }
 
     private static BigDecimal removeCommasFromStrMagnitude(final String numberWithCommas) {
-
         String numberWithoutCommas = numberWithCommas.replace(",", "");
         return new BigDecimal(numberWithoutCommas);
     }
@@ -146,8 +148,7 @@ public class ExpCommercial {
     private static Set<Integer> seekOutPilots(String bufferA, String bufferB) {
         String[] a = removeEmpties(bufferA.split("\n"));
         String[] b = removeEmpties(bufferB.split("\n"));
-
-        Set<Integer> pilots = new LinkedHashSet<Integer>();
+        Set<Integer> pilots = new LinkedHashSet<>();
         int i = 0;
         int j = 0;
         do {
@@ -158,11 +159,13 @@ public class ExpCommercial {
             }
             j++;
         } while (j < b.length);
-
         return pilots;
     }
 
-    private List<Merchandise> parseMercsBuffers(List<String> buffers, List<String> primes) {
+    private List<Merchandise> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
+        if (buffers.size() != primes.size()) {
+            throw new InvoiceOcrException("Original and Prime buffers must feature equal size", ErrorCodes.INVALID_INPUT_TO_PARSE);
+        }
         var listMercs = new LinkedList<Merchandise>();
         for (int buffIdx = 0; buffIdx < buffers.size(); buffIdx++) {
             extractMercsFromBuffer(listMercs, buffers.get(buffIdx), primes.get(buffIdx));
@@ -227,14 +230,12 @@ public class ExpCommercial {
     }
 
     private static String[] removeEmpties(String[] inputArray) {
-
         int nonEmptyCount = 0;
         for (String str : inputArray) {
             if (!str.isEmpty() && !str.trim().isEmpty()) {
                 nonEmptyCount++;
             }
         }
-
         String[] resultArray = new String[nonEmptyCount];
         int index = 0;
         for (String str : inputArray) {
@@ -243,7 +244,6 @@ public class ExpCommercial {
                 index++;
             }
         }
-
         return resultArray;
     }
 }
