@@ -15,7 +15,7 @@ public class XmlWritingHelper {
             Transformer transformer;
             transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); // Indent with 2 spaces
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             DOMSource source = new javax.xml.transform.dom.DOMSource(doc);
             StringWriter writer = new java.io.StringWriter();
             StreamResult result = new javax.xml.transform.stream.StreamResult(writer);
