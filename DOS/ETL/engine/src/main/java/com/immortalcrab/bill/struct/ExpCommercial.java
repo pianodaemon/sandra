@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.math.BigDecimal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -63,6 +65,18 @@ public class ExpCommercial {
                 var buffers = syms.get(name);
                 final String firstElement = buffers.get(0);
                 corrections.put(name, removeNewLines(firstElement));
+            }
+            {
+                /* Latest reference symbol make up
+                   Just looking for the second set of digits */
+                var referenceChunk = (String) corrections.get(SYM_REFERENCE);
+                var pattern = Pattern.compile("^(.*)\\b([0-9]+)$");
+                Matcher m = pattern.matcher(referenceChunk);
+                if (m.find()) {
+                    corrections.put(SYM_REFERENCE, m.group(2));
+                } else {
+                    log.warn("reference symbol make up has been skipped");
+                }
             }
             log.info("Turning the corrections into structured data");
             return genXmlFromCorrections(corrections);
