@@ -160,7 +160,9 @@ public class ExpCommercial {
         }
         var listMercs = new LinkedList<MerchandiseItem>();
         for (int buffIdx = 0; buffIdx < buffers.size(); buffIdx++) {
-            extractMercsFromBuffer(listMercs, buffers.get(buffIdx), primes.get(buffIdx));
+            if (!buffers.get(buffIdx).isBlank() && !primes.get(buffIdx).isBlank()) {
+                extractMercsFromBuffer(listMercs, buffers.get(buffIdx), primes.get(buffIdx));
+            }
         }
         return listMercs;
     }
