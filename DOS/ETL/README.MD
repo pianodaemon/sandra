@@ -5,6 +5,7 @@ ETI stands for Extract transform of invoices
 ##### Install the shared library tesseract (the ocr lib) in Linux Debian
 ```sh
 sudo apt-get install libtesseract-dev
+```
 
 ##### Trainning data is required
 Trained data files shall be found at any folder pointed out by the TESSDATA_PREFIX environment variable.
