@@ -1,5 +1,5 @@
-## ETI (Sandra's project)
-ETI stands for Extract transform invoices
+## ETI (A Sandra's child project for data operational systems)
+ETI stands for Extract transform of invoices
 
 #### Building from source
 ##### Install the shared library tesseract (the ocr lib)
