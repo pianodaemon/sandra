@@ -4,7 +4,7 @@ import com.immortalcrab.bill.struct.ExpCommercial;
 import com.immortalcrab.bill.pdf.RenderPngHelper;
 import com.immortalcrab.bill.struct.XmlWritingHelper;
 
-public class OcrHelper {
+public class InvoiceOcr {
 
     public static void main(String[] args) {
 
