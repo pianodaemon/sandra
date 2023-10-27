@@ -201,14 +201,11 @@ public class ExpCommercial {
                         listMercs.add(merchandise);
                         continue;
                     }
-                    if (lineCorrected.startsWith(SERIAL_NUMBER_COLON)) {
-                        var serials = merchandise.getSerialNumbers();
-                        serials.add(lineCorrected.replace(SERIAL_NUMBER_COLON, "").trim());
-                        merchandise.setSerialNumbers(serials);
-                        // Special case when there is no more lines to parse 
-                        if (idx == (lines.length - 1)) {
-                            listMercs.add(merchandise);
-                        }
+                    var serials = merchandise.getSerialNumbers();
+                    serials.add(lineCorrected.replace(SERIAL_NUMBER_COLON, "").trim());
+                    merchandise.setSerialNumbers(serials);
+                    if (idx == (lines.length - 1)) {
+                        listMercs.add(merchandise);
                     }
                     break;
             }
