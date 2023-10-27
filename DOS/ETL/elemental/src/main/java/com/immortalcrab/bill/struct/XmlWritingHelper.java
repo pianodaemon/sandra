@@ -17,7 +17,7 @@ public class XmlWritingHelper {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(new DOMSource(document), new StreamResult(new File(filePath)));
         } catch (TransformerException ex) {
-            throw new InvoiceOcrException("", ex);
+            throw new InvoiceOcrException("Saving XML in disk face issues", ex);
         }
     }
 }
