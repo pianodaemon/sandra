@@ -33,13 +33,8 @@ public class BillOcr {
 
     private static ITesseract setupTesseract() {
         ITesseract tesseract = new Tesseract();
-        tesseract.setDatapath(TESS_DATA_DEFAULT_DIR);
         tesseract.setPageSegMode(11);
         tesseract.setOcrEngineMode(2);
-        File directory = new File(TESS_DATA_DEFAULT_DIR);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
         return tesseract;
     }
 
