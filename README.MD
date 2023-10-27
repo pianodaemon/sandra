@@ -1,7 +1,7 @@
 ## ETI (Sandra's project)
 ETI stands for Extract transform invoices
 
-#### Building for source
+#### Building from source
 ##### Install the shared library tesseract (the ocr lib)
 ```sh
 sudo apt-get install libtesseract-dev
