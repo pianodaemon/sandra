@@ -20,7 +20,6 @@ import lombok.NonNull;
 public class BillOcr {
 
     private static final int PAGE_DOES_NOT_MATTER = 0;
-    private static final String TESS_DATA_DEFAULT_DIR = "tessdata";
 
     protected final @NonNull
     ITransformer imgTransformer;
