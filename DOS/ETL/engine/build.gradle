@@ -8,4 +8,6 @@ compileTestJava.options.encoding = "UTF-8"
 dependencies {
 
     implementation project(':elemental')
+
+    implementation "commons-cli:commons-cli:${commoncli_version}"
 }
