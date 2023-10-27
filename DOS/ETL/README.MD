@@ -12,4 +12,4 @@ echo 'export TESSDATA_PREFIX=$HOME/tessdata' >> ~/.profile
 ```sh
 ./gradlew run --args="-i=../XXXXXX-export_comercial_invoce.pdf -o=../XXXXXX-export_comercial_invoce.xml"
 ```
-> Note: `-i` and are required to provide a relative or absolute path to the PDF input and XML output.
+> Note: `-i` and `-o` are required to provide a relative or absolute path to the PDF input and XML output.
