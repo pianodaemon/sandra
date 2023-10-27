@@ -17,7 +17,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @AllArgsConstructor
 public class ExpCommercial {
 
@@ -49,6 +51,7 @@ public class ExpCommercial {
             InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
             Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
             Map<String, Object> corrections = new HashMap<>();
+            log.info("Applying corrections to the symbol buffers");
             corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
             corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
             corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
@@ -61,6 +64,7 @@ public class ExpCommercial {
                 final String firstElement = buffers.get(0);
                 corrections.put(name, removeNewLines(firstElement));
             }
+            log.info("Turning the corrections into structured data");
             return genXmlFromCorrections(corrections);
         } catch (ParserConfigurationException ex) {
             final String emsg = "The xml document containing the symbols can not be rendered";
@@ -156,14 +160,17 @@ public class ExpCommercial {
 
     private List<MerchandiseItem> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
         if (buffers.size() != primes.size()) {
-            throw new InvoiceOcrException("Original and Prime buffers must feature equal size", ErrorCodes.INVALID_INPUT_TO_PARSE);
+            final String emsg = "Original and Prime buffers must feature equal number of elements";
+            throw new InvoiceOcrException(emsg, ErrorCodes.INVALID_INPUT_TO_PARSE);
         }
         var listMercs = new LinkedList<MerchandiseItem>();
         for (int buffIdx = 0; buffIdx < buffers.size(); buffIdx++) {
             // The pages not containing MerchandiseItems are featuring blank buffers
             if (!buffers.get(buffIdx).isBlank() && !primes.get(buffIdx).isBlank()) {
                 extractMercsFromBuffer(listMercs, buffers.get(buffIdx), primes.get(buffIdx));
+                continue;
             }
+            log.warn("We have found a page not containing merchandise items");
         }
         return listMercs;
     }
