@@ -3,6 +3,7 @@ package com.immortalcrab.bill.ocr;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
@@ -42,13 +43,13 @@ public class BillOcr {
         return tesseract;
     }
 
-    public Map<String, List<String>> fetchSymbols(String pdfFilePath, String distPath) throws InvoiceOcrException {
+    public Map<String, List<String>> fetchSymbols(String pdfFilePath, InputStream distInputStream) throws InvoiceOcrException {
         Map<String, List<String>> syms = new HashMap<>();
         ITesseract tesseract = setupTesseract();
         BillDistribution dist;
         String[] paths;
         try {
-            dist = BillDistribution.obtainFromFile(distPath);
+            dist = BillDistribution.obtainFromInputStream(distInputStream);
             paths = imgTransformer.transformFromFile(null, new File(pdfFilePath));
         } catch (IOException ex) {
             final String emsg = "A file resource required to fetch the symbols can not be read or written";

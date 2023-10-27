@@ -11,9 +11,7 @@ public class OcrHelper {
         try {
             var bocr = new BillOcr(RenderPngHelper::transformFromPdf);
             String pdfFilePath = "C:\\Users\\Edwin Plauchu\\Downloads\\xxxxx\\907773-PrecioVenta.pdf";
-            //String pdfFilePath = "C:\\Users\\Edwin Plauchu\\Downloads\\xxxxx\\908168-PrecioVenta.pdf";
-            String profileDirPath = ".";
-            ExpCommercial invoice = new ExpCommercial(profileDirPath, (distPath) -> bocr.fetchSymbols(pdfFilePath, distPath));
+            ExpCommercial invoice = new ExpCommercial((distInputStream) -> bocr.fetchSymbols(pdfFilePath, distInputStream));
 
             System.out.println(XmlWritingHelper.indentateDocument(invoice.structureData()));
 

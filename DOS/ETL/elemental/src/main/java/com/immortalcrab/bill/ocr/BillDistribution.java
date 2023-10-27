@@ -12,6 +12,7 @@ import com.immortalcrab.bill.meta.JsonToMapHelper;
 import com.immortalcrab.bill.meta.LegoAssembler;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,12 +29,19 @@ class BillDistribution extends JsonToMapHelper {
     }
 
     public static BillDistribution obtainFromFile(File distFile) throws InvoiceOcrException {
-        InputStreamReader distIsr;
         try {
-            distIsr = new InputStreamReader(new FileInputStream(distFile));
-            return new BillDistribution(distIsr);
+            return obtainFromInputStream(new FileInputStream(distFile));
         } catch (IOException ex) {
             final String emsg = "Distribution file is not available as needed";
+            throw new InvoiceOcrException(emsg, ex);
+        }
+    }
+
+    public static BillDistribution obtainFromInputStream(InputStream is) throws InvoiceOcrException {
+        try {
+            return new BillDistribution(new InputStreamReader(is));
+        } catch (IOException ex) {
+            final String emsg = "Distribution input stream is not available as needed";
             throw new InvoiceOcrException(emsg, ex);
         }
     }

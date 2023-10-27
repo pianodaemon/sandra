@@ -2,8 +2,7 @@ package com.immortalcrab.bill.struct;
 
 import com.immortalcrab.bill.ocr.ErrorCodes;
 import com.immortalcrab.bill.ocr.InvoiceOcrException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -16,7 +15,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 
 import lombok.AllArgsConstructor;
 
@@ -38,24 +36,18 @@ public class ExpCommercial {
     private static final String SYM_SHIP_TO_ADDR = "SHIP_TO_ADDR";
     private static final String SERIAL_NUMBER_COLON = "Serial Number:";
 
-    private final String profileDirPath;
     private final ISymbolProvider symProvider;
 
     @FunctionalInterface
     public interface ISymbolProvider {
 
-        public Map<String, List<String>> fetchSymbols(String distPath) throws InvoiceOcrException;
-    }
-
-    private String resolveDistributionPath() {
-        Path rootPath = Paths.get(profileDirPath);
-        Path partialPath = Paths.get(DIST_FILE);
-        return rootPath.resolve(partialPath).toString();
+        public Map<String, List<String>> fetchSymbols(InputStream is) throws InvoiceOcrException;
     }
 
     public Document structureData() throws InvoiceOcrException {
         try {
-            Map<String, List<String>> syms = symProvider.fetchSymbols(resolveDistributionPath());
+            InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
+            Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
             Map<String, Object> corrections = new HashMap<>();
             corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
             corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
