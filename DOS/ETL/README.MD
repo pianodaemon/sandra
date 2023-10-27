@@ -6,6 +6,7 @@ ETI stands for Extract transform of invoices
 ```sh
 sudo apt-get install libtesseract-dev
 echo 'export TESSDATA_PREFIX=$HOME/tessdata' >> ~/.profile
+source ~/.profile
 ```
 
 ##### Compile and run along with needed arguments
