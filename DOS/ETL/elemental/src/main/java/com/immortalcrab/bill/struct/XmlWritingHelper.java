@@ -6,7 +6,6 @@ import java.io.File;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-import java.io.StringWriter;
 
 public class XmlWritingHelper {
 
