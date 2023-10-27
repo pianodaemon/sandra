@@ -2,7 +2,7 @@
 ETI stands for Extract transform of invoices
 
 #### Building from source
-##### Install the shared library tesseract (the ocr lib) in Debian
+##### Install the shared library tesseract (the ocr lib) in Linux Debian
 ```sh
 sudo apt-get install libtesseract-dev
 echo 'export TESSDATA_PREFIX=$HOME/tessdata' >> ~/.profile
