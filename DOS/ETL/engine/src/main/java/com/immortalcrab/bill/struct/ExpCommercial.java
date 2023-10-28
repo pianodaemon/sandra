@@ -61,16 +61,12 @@ public class ExpCommercial {
             corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
             corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
             corrections.put(SYM_SHIP_TO_ADDR, replaceNewLinesForSpaces.apply(SYM_SHIP_TO_ADDR));
-            {
-                String[] names = {
-                    SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM,
-                    SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL
-                };
-                for (String name : names) {
-                    var buffers = syms.get(name);
-                    final String firstElement = buffers.get(0);
-                    corrections.put(name, removeNewLines(firstElement));
-                }
+            for (String name : new String[]{
+                SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM, SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL
+            }) {
+                var buffers = syms.get(name);
+                final String firstElement = buffers.get(0);
+                corrections.put(name, removeNewLines(firstElement));
             }
             {
                 /* Latest reference symbol make up
