@@ -37,7 +37,8 @@ public class InvoiceOcr {
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmdLine;
-        String pdfFilePath, xmlFilePath;
+        String pdfFilePath;
+        String xmlFilePath;
         try {
             cmdLine = parser.parse(options, args);
             pdfFilePath = cmdLine.getOptionValue('i');
