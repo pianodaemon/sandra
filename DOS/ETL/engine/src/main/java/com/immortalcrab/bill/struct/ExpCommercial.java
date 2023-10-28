@@ -25,6 +25,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 public class ExpCommercial {
 
+    private static final int NUM_DIGITS_AFTER_ZIP = 5;
     private static final BigDecimal FACTOR_KILOGRAM_TO_POUND = new BigDecimal("2.20462");
     private static final String DIST_FILE = "export_commercial_invoice.json";
     private static final String SYM_MERC_DESC = "MERC_DESC";
@@ -76,6 +77,26 @@ public class ExpCommercial {
                     corrections.put(SYM_REFERENCE, m.group(2));
                 } else {
                     log.warn("reference symbol make up has been skipped");
+                }
+            }
+            {
+                /* Latest ship to addr symbol make up
+                   Just allowing 5 digits as ZIP */
+                var shipToAddrChunk = (String) corrections.get(SYM_SHIP_TO_ADDR);
+                var pattern = Pattern.compile("^(.+[zZ][iI][pP]:) (.*)$");
+                Matcher m = pattern.matcher(shipToAddrChunk);
+                if (m.find()) {
+                    String zipAlpha = m.group(2);
+                    StringBuilder zipAlphaSimplified = new StringBuilder();
+                    for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < NUM_DIGITS_AFTER_ZIP; i++) {
+                        char ch = zipAlpha.charAt(i);
+                        if (!Character.isWhitespace(ch)) {
+                            zipAlphaSimplified.append(ch);
+                        }
+                    }
+                    corrections.put(SYM_SHIP_TO_ADDR, m.group(1) + " " + zipAlphaSimplified);
+                } else {
+                    log.warn("ship to addr symbol make up has been skipped");
                 }
             }
             log.info("Turning the corrections into structured data");
