@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.math.BigDecimal;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -54,18 +55,22 @@ public class ExpCommercial {
             InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
             Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
             Map<String, Object> corrections = new HashMap<>();
+	    UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
             log.info("Applying corrections to the symbol buffers");
             corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
             corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
             corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
-            String[] names = {
-                SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM,
-                SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL, SYM_SHIP_TO_ADDR
-            };
-            for (String name : names) {
-                var buffers = syms.get(name);
-                final String firstElement = buffers.get(0);
-                corrections.put(name, removeNewLines(firstElement));
+            corrections.put(SYM_SHIP_TO_ADDR, replaceNewLinesForSpaces.apply(SYM_SHIP_TO_ADDR));
+            {
+                String[] names = {
+                    SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM,
+                    SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL
+                };
+                for (String name : names) {
+                    var buffers = syms.get(name);
+                    final String firstElement = buffers.get(0);
+                    corrections.put(name, removeNewLines(firstElement));
+                }
             }
             {
                 /* Latest reference symbol make up
