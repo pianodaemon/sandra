@@ -160,12 +160,11 @@ public class ExpCommercial {
 
     private static List<String> groomBuffers(List<String> buffers) {
         var particles = new LinkedList<String>();
-        buffers.stream().map(buff -> buff.split("\n")).forEachOrdered((String[] tokens) -> {
+        buffers.stream().map(buff -> buff.split("\n")).forEachOrdered(tokens -> {
             for (var tok : tokens) {
-                if (tok.isBlank()) {
-                    continue;
+                if (!tok.isBlank()) {
+                    particles.add(tok);
                 }
-                particles.add(tok);
             }
         });
         return particles;

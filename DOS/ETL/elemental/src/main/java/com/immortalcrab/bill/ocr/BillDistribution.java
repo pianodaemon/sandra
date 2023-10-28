@@ -68,14 +68,12 @@ class BillDistribution extends JsonToMapHelper {
         sections.stream().map(i -> {
             Section p = new Section();
             p.setTitle(LegoAssembler.obtainObjFromKey(i, "title"));
-
-            var rect = new Rectangle(
+            p.setRect(new Rectangle(
                     LegoAssembler.obtainObjFromKey(i, "x"),
                     LegoAssembler.obtainObjFromKey(i, "y"),
                     LegoAssembler.obtainObjFromKey(i, "width"),
                     LegoAssembler.obtainObjFromKey(i, "height")
-            );
-            p.setRect(rect);
+            ));
             return p;
         }).forEachOrdered(ss::add);
         return ss;
