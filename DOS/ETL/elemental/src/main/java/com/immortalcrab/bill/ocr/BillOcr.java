@@ -32,6 +32,7 @@ public class BillOcr {
 
     private static ITesseract setupTesseract() {
         ITesseract tesseract = new Tesseract();
+        tesseract.setVariable("user_defined_dpi", "300");
         tesseract.setPageSegMode(11);
         tesseract.setOcrEngineMode(2);
         return tesseract;
