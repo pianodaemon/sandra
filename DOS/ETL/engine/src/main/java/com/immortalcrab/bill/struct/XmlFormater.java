@@ -7,8 +7,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import com.immortalcrab.bill.ocr.InvoiceOcrException;
+import org.w3c.dom.Document;
+import java.io.File;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
 
 @AllArgsConstructor
 public class XmlFormater {
@@ -83,5 +88,17 @@ public class XmlFormater {
             }
         }
         return doc;
+    }
+
+    public static void writeXMLToFile(String filePath, Document document) throws InvoiceOcrException {
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.transform(new DOMSource(document), new StreamResult(new File(filePath)));
+        } catch (TransformerException ex) {
+            throw new InvoiceOcrException("Saving XML in disk face issues", ex);
+        }
     }
 }
