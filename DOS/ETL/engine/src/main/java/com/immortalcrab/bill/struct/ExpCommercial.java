@@ -115,8 +115,8 @@ public class ExpCommercial<S> {
         }
     }
 
-    public S structureData() throws InvoiceOcrException {
-        return formater.render();
+    public void carryStructureOut(String xmlFilePath) throws InvoiceOcrException {
+        formater.renderFeaturingSave(xmlFilePath);
     }
 
     private enum MItemSM {
