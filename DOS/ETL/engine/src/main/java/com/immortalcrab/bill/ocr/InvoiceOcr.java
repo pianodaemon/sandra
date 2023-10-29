@@ -51,6 +51,6 @@ public class InvoiceOcr {
 
         BillOcr bocr = new BillOcr(RenderPngHelper::transformFromPdf);
         ExpCommercial<Document> invoice = new ExpCommercial<>((distInputStream) -> bocr.fetchSymbols(pdfFilePath, distInputStream), XmlFormater.class);
-        XmlFormater.writeXMLToFile(xmlFilePath, invoice.structureData());
+        invoice.carryStructureOut(xmlFilePath);
     }
 }
