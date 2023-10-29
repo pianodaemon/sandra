@@ -27,7 +27,6 @@ import lombok.extern.log4j.Log4j2;
 public class ExpCommercial {
 
     private static final int NUM_DIGITS_AFTER_ZIP = 5;
-    private static final BigDecimal FACTOR_KILOGRAM_TO_POUND = new BigDecimal("2.20462");
     private static final String DIST_FILE = "export_commercial_invoice.json";
     private static final String SYM_MERC_DESC = "MERC_DESC";
     private static final String SYM_MERC_DESC_PILOT = "MERC_DESC_PILOT";
@@ -55,18 +54,18 @@ public class ExpCommercial {
             InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
             Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
             Map<String, Object> corrections = new HashMap<>();
-	    UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
+            UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
             log.info("Applying corrections to the symbol buffers");
             corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
-            corrections.put(SYM_MERC_WEIGHT, sublistWithoutLast(groomBuffers(syms.get(SYM_MERC_WEIGHT))));
-            corrections.put(SYM_MERC_QUANTITY, groomBuffers(syms.get(SYM_MERC_QUANTITY)));
+            corrections.put(SYM_MERC_WEIGHT, ManeuverHelper.sublistWithoutLast(ManeuverHelper.groomBuffers(syms.get(SYM_MERC_WEIGHT))));
+            corrections.put(SYM_MERC_QUANTITY, ManeuverHelper.groomBuffers(syms.get(SYM_MERC_QUANTITY)));
             corrections.put(SYM_SHIP_TO_ADDR, replaceNewLinesForSpaces.apply(SYM_SHIP_TO_ADDR));
             for (String name : new String[]{
                 SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM, SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL
             }) {
                 var buffers = syms.get(name);
                 final String firstElement = buffers.get(0);
-                corrections.put(name, removeNewLines(firstElement));
+                corrections.put(name, ManeuverHelper.removeNewLines(firstElement));
             }
             {
                 /* Latest reference symbol make up
@@ -108,11 +107,6 @@ public class ExpCommercial {
         }
     }
 
-    private static BigDecimal removeCommasFromStrMagnitude(final String numberWithCommas) {
-        String numberWithoutCommas = removeSpaces(numberWithCommas.replace(",", ""));
-        return new BigDecimal(numberWithoutCommas);
-    }
-
     private static Document genXmlFromCorrections(Map<String, Object> corrections) throws ParserConfigurationException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -139,9 +133,9 @@ public class ExpCommercial {
             itemElement.setAttribute("partNumber", item.getPartNumber().orElseThrow());
             itemElement.setAttribute("description", item.getDescription().orElseThrow());
             itemElement.setAttribute("quantity", quantity.get(idx));
-            BigDecimal kgs = removeCommasFromStrMagnitude(weights.get(idx));
+            BigDecimal kgs = ManeuverHelper.removeCommasFromStrMagnitude(weights.get(idx));
             itemElement.setAttribute("weightAsKilograms", kgs.toPlainString());
-            BigDecimal pounds = removeCommasFromStrMagnitude(weights.get(idx)).multiply(FACTOR_KILOGRAM_TO_POUND);
+            BigDecimal pounds = ManeuverHelper.kgsMagnitude(ManeuverHelper.removeCommasFromStrMagnitude(weights.get(idx)));
             itemElement.setAttribute("weightAsPounds", pounds.toPlainString());
             merchandiseElement.appendChild(itemElement);
 
@@ -158,39 +152,10 @@ public class ExpCommercial {
         return doc;
     }
 
-    private static List<String> groomBuffers(List<String> buffers) {
-        var particles = new LinkedList<String>();
-        buffers.stream().map(buff -> buff.split("\n")).forEachOrdered(tokens -> {
-            for (var tok : tokens) {
-                if (!tok.isBlank()) {
-                    particles.add(tok);
-                }
-            }
-        });
-        return particles;
-    }
-
-    private enum Pickup {
+    private enum MItemSM {
         PARTNUM,
         DESCRIPTION,
         SERIAL
-    }
-
-    private static Set<Integer> seekOutPilots(String bufferA, String bufferB) {
-        String[] a = removeEmpties(bufferA.split("\n"));
-        String[] b = removeEmpties(bufferB.split("\n"));
-        Set<Integer> pilots = new LinkedHashSet<>();
-        int i = 0;
-        int j = 0;
-        do {
-            if (a[i].equals(b[j])) {
-                i++;
-            } else {
-                pilots.add(i - 1);
-            }
-            j++;
-        } while (j < b.length);
-        return pilots;
     }
 
     private List<MerchandiseItem> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
@@ -211,26 +176,26 @@ public class ExpCommercial {
     }
 
     private static void extractMercsFromBuffer(List<MerchandiseItem> listMercs, String bufferA, String bufferB) {
-        Set<Integer> pilots = seekOutPilots(bufferA, bufferB);
-        String[] lines = removeEmpties(bufferA.split("\n"));
+        Set<Integer> pilots = ManeuverHelper.seekOutPilots(bufferA, bufferB);
+        String[] lines = ManeuverHelper.removeEmpties(bufferA.split("\n"));
         MerchandiseItem merchandise = null;
-        Pickup state = Pickup.PARTNUM;
+        MItemSM state = MItemSM.PARTNUM;
         int idx = 0;
         while (idx < lines.length) {
-            var lineCorrected = removeNewLines(lines[idx]);
+            var lineCorrected = ManeuverHelper.removeNewLines(lines[idx]);
             switch (state) {
                 case PARTNUM:
                     merchandise = new MerchandiseItem(lineCorrected, null, new LinkedList<>());
-                    state = Pickup.DESCRIPTION;
+                    state = MItemSM.DESCRIPTION;
                     break;
                 case DESCRIPTION:
                     if (pilots.contains(idx)) {
-                        state = Pickup.PARTNUM;
+                        state = MItemSM.PARTNUM;
                         listMercs.add(merchandise);
                         continue;
                     }
                     if (lineCorrected.startsWith(SERIAL_NUMBER_COLON)) {
-                        state = Pickup.SERIAL;
+                        state = MItemSM.SERIAL;
                         continue;
                     } else {
                         var desc = merchandise.getDescription().orElse("") + " " + lineCorrected;
@@ -239,7 +204,7 @@ public class ExpCommercial {
                     break;
                 case SERIAL:
                     if (pilots.contains(idx)) {
-                        state = Pickup.PARTNUM;
+                        state = MItemSM.PARTNUM;
                         listMercs.add(merchandise);
                         continue;
                     }
@@ -253,35 +218,5 @@ public class ExpCommercial {
             }
             idx++;
         }
-    }
-
-    private static String removeSpaces(String buffer) {
-        return buffer.replaceAll("\\s","");
-    }
-
-    private static String removeNewLines(String buffer) {
-        return buffer.replace("\n", "");
-    }
-
-    private static <T> List<T> sublistWithoutLast(List<T> originalList) {
-        return originalList.subList(0, originalList.size() - 1);
-    }
-
-    private static String[] removeEmpties(String[] inputArray) {
-        int nonEmptyCount = 0;
-        for (String str : inputArray) {
-            if (!str.isEmpty() && !str.trim().isEmpty()) {
-                nonEmptyCount++;
-            }
-        }
-        String[] resultArray = new String[nonEmptyCount];
-        int index = 0;
-        for (String str : inputArray) {
-            if (!str.isEmpty() && !str.trim().isEmpty()) {
-                resultArray[index] = str;
-                index++;
-            }
-        }
-        return resultArray;
     }
 }
