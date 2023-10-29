@@ -58,7 +58,7 @@ public class RenderPngHelper {
         String[] files = new String[noPages];
         for (int idx = 0; idx < noPages; idx++) {
             files[idx] = outputImageDirectory + "/" + title + "_" + (idx + 1) + "." + IMAGE_EXT;
-            BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(idx, 300, ImageType.RGB);
+            BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(idx, 300, ImageType.BINARY);
             ImageIO.write(bufferedImage, IMAGE_EXT.toUpperCase(), new File(files[idx]));
         }
         return files;
