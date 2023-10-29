@@ -6,8 +6,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.w3c.dom.Element;
 import com.immortalcrab.bill.ocr.InvoiceOcrException;
 import org.w3c.dom.Document;
@@ -16,38 +14,13 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 
-@AllArgsConstructor
-public class XmlFormater implements IOutputFormater<Document> {
+public class XmlFormater extends OutputFormater<Document> {
 
-    @NonNull
-    private final String invoiceNum;
-
-    @NonNull
-    private final String shipToAddr;
-
-    @NonNull
-    private final String foreignCarrier;
-
-    @NonNull
-    private final String reference;
-
-    @NonNull
-    private final String bultos;
-
-    @NonNull
-    private final String seal;
-
-    @NonNull
-    private final String conEcoNum;
-
-    @NonNull
-    private final List<MerchandiseItem> descriptions;
-
-    @NonNull
-    private final List<String> quantities;
-
-    @NonNull
-    private final List<String> weights;
+    public XmlFormater(String invoiceNum, String shipToAddr, String foreignCarrier,
+            String reference, String bultos, String seal, String conEcoNum,
+            List<MerchandiseItem> descriptions, List<String> quantities, List<String> weights) {
+        super(invoiceNum, shipToAddr, foreignCarrier, reference, bultos, seal, conEcoNum, descriptions, quantities, weights);
+    }
 
     @Override
     public Document render() throws InvoiceOcrException {
