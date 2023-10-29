@@ -109,7 +109,7 @@ public class ExpCommercial {
     }
 
     private static BigDecimal removeCommasFromStrMagnitude(final String numberWithCommas) {
-        String numberWithoutCommas = numberWithCommas.replace(",", "");
+        String numberWithoutCommas = removeSpaces(numberWithCommas.replace(",", ""));
         return new BigDecimal(numberWithoutCommas);
     }
 
@@ -253,6 +253,10 @@ public class ExpCommercial {
             }
             idx++;
         }
+    }
+
+    private static String removeSpaces(String buffer) {
+        return buffer.replaceAll("\\s","");
     }
 
     private static String removeNewLines(String buffer) {
