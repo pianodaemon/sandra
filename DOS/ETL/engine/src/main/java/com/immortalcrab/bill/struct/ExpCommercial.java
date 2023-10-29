@@ -76,27 +76,9 @@ public final class ExpCommercial<S> {
                 log.warn("reference symbol make up has been skipped");
             }
         }
-        {
-            /* Latest ship to addr symbol make up
-                Just allowing 5 digits as ZIP */
-            var shipToAddrChunk = (String) corrections.get(SYM_SHIP_TO_ADDR);
-            var pattern = Pattern.compile("^(.+[zZ][iI][pP]:) (.*)$");
-            Matcher m = pattern.matcher(shipToAddrChunk);
-            if (m.find()) {
-                String zipAlpha = m.group(2);
-                StringBuilder zipAlphaSimplified = new StringBuilder();
-                for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < NUM_DIGITS_AFTER_ZIP; i++) {
-                    char ch = zipAlpha.charAt(i);
-                    if (!Character.isWhitespace(ch)) {
-                        zipAlphaSimplified.append(ch);
-                    }
-                }
-                corrections.put(SYM_SHIP_TO_ADDR, m.group(1) + " " + zipAlphaSimplified);
-            } else {
-                log.warn("ship to addr symbol make up has been skipped");
-            }
-        }
-        log.info("Setting formater finally");
+        corrections.put(SYM_SHIP_TO_ADDR, makeUpShipToAddr((String) corrections.get(SYM_SHIP_TO_ADDR)));
+
+        log.info("Proceeding to set up the formater finally");
         try {
             return formaterClass.getConstructor(
                     String.class,
@@ -196,5 +178,24 @@ public final class ExpCommercial<S> {
             }
             idx++;
         }
+    }
+
+    private static String makeUpShipToAddr(final String shipToAddrChunk) throws InvoiceOcrException {
+        // Just allowing 5 digits as ZIP
+        var pattern = Pattern.compile("^(.+[zZ][iI][pP]:) (.*)$");
+        Matcher m = pattern.matcher(shipToAddrChunk);
+        if (m.find()) {
+            String zipAlpha = m.group(2);
+            StringBuilder zipAlphaSimplified = new StringBuilder();
+            for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < NUM_DIGITS_AFTER_ZIP; i++) {
+                char ch = zipAlpha.charAt(i);
+                if (!Character.isWhitespace(ch)) {
+                    zipAlphaSimplified.append(ch);
+                }
+            }
+            return m.group(1) + " " + zipAlphaSimplified;
+        }
+        final String emsg = "ship to addr symbol make up has been skipped";
+        throw new InvoiceOcrException(emsg, ErrorCodes.INVALID_INPUT_TO_PARSE);
     }
 }
