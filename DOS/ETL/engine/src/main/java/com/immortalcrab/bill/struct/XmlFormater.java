@@ -97,7 +97,8 @@ public class XmlFormater implements IOutputFormater<Document> {
         return doc;
     }
 
-    public static void writeXMLToFile(String filePath, Document document) throws InvoiceOcrException {
+    @Override
+    public void saveOnStorage(String filePath, Document document) throws InvoiceOcrException {
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
