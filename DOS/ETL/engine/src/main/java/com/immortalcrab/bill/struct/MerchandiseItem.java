@@ -8,13 +8,13 @@ import lombok.Setter;
 
 @Setter
 @AllArgsConstructor
-class MerchandiseItem {
+public class MerchandiseItem {
 
-    private String partNumber;
-    private String description;
+    protected String partNumber;
+    protected String description;
 
     @NonNull
-    private List<String> serialNumbers;
+    protected List<String> serialNumbers;
 
     public Optional<String> getPartNumber() {
         return Optional.ofNullable(partNumber);
