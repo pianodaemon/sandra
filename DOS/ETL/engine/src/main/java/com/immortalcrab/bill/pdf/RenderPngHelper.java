@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RenderPngHelper {
 
-    private static final String IMAGE_EXT = "png";
+    private static final String IMAGE_EXT = "jpg";
     private static final String DEFAULT_OUTPUT_IMAGE_DIR = "outputImages";
 
     private final String outputImageDirectory;
