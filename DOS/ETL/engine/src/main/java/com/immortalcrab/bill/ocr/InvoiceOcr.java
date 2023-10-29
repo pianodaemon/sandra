@@ -9,6 +9,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.w3c.dom.Document;
 
 public class InvoiceOcr {
 
@@ -49,7 +50,7 @@ public class InvoiceOcr {
         }
 
         BillOcr bocr = new BillOcr(RenderPngHelper::transformFromPdf);
-        ExpCommercial invoice = new ExpCommercial((distInputStream) -> bocr.fetchSymbols(pdfFilePath, distInputStream));
+        ExpCommercial<Document> invoice = new ExpCommercial<>((distInputStream) -> bocr.fetchSymbols(pdfFilePath, distInputStream), XmlFormater.class);
         XmlFormater.writeXMLToFile(xmlFilePath, invoice.structureData());
     }
 }

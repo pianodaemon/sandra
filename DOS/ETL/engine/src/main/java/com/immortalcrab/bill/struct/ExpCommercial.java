@@ -11,15 +11,12 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
+import java.lang.reflect.InvocationTargetException;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-@AllArgsConstructor
-public class ExpCommercial {
+public class ExpCommercial<S> {
 
     private static final int NUM_DIGITS_AFTER_ZIP = 5;
     private static final String DIST_FILE = "export_commercial_invoice.json";
@@ -36,66 +33,73 @@ public class ExpCommercial {
     private static final String SYM_SHIP_TO_ADDR = "SHIP_TO_ADDR";
     private static final String SERIAL_NUMBER_COLON = "Serial Number:";
 
-    private final ISymbolProvider symProvider;
+    private final IOutputFormater<S> formater;
 
-    @FunctionalInterface
-    public interface ISymbolProvider {
+    public ExpCommercial(ISymbolProvider symProvider, Class<? extends IOutputFormater<S>> formaterClass) throws InvoiceOcrException {
 
-        public Map<String, List<String>> fetchSymbols(InputStream is) throws InvoiceOcrException;
-    }
-
-    public Document structureData() throws InvoiceOcrException {
-        try {
-            InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
-            Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
-            Map<String, Object> corrections = new HashMap<>();
-            UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
-            log.info("Applying corrections to the symbol buffers");
-            corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
-            corrections.put(SYM_MERC_WEIGHT, ManeuverHelper.sublistWithoutLast(ManeuverHelper.groomBuffers(syms.get(SYM_MERC_WEIGHT))));
-            corrections.put(SYM_MERC_QUANTITY, ManeuverHelper.groomBuffers(syms.get(SYM_MERC_QUANTITY)));
-            corrections.put(SYM_SHIP_TO_ADDR, replaceNewLinesForSpaces.apply(SYM_SHIP_TO_ADDR));
-            for (String name : new String[]{
-                SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM, SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL
-            }) {
-                var buffers = syms.get(name);
-                final String firstElement = buffers.get(0);
-                corrections.put(name, ManeuverHelper.removeNewLines(firstElement));
+        InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
+        Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
+        Map<String, Object> corrections = new HashMap<>();
+        UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
+        log.info("Applying corrections to the symbol buffers");
+        corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
+        corrections.put(SYM_MERC_WEIGHT, ManeuverHelper.sublistWithoutLast(ManeuverHelper.groomBuffers(syms.get(SYM_MERC_WEIGHT))));
+        corrections.put(SYM_MERC_QUANTITY, ManeuverHelper.groomBuffers(syms.get(SYM_MERC_QUANTITY)));
+        corrections.put(SYM_SHIP_TO_ADDR, replaceNewLinesForSpaces.apply(SYM_SHIP_TO_ADDR));
+        for (String name : new String[]{
+            SYM_INVOICE_NUM, SYM_BULTOS, SYM_CON_ECO_NUM, SYM_FOREIGN_CARRIER, SYM_REFERENCE, SYM_SEAL
+        }) {
+            var buffers = syms.get(name);
+            final String firstElement = buffers.get(0);
+            corrections.put(name, ManeuverHelper.removeNewLines(firstElement));
+        }
+        {
+            /* Latest reference symbol make up
+                Just looking for the second set of digits */
+            var referenceChunk = (String) corrections.get(SYM_REFERENCE);
+            var pattern = Pattern.compile("^(.*)\\b([0-9]+)$");
+            Matcher m = pattern.matcher(referenceChunk);
+            if (m.find()) {
+                corrections.put(SYM_REFERENCE, m.group(2));
+            } else {
+                log.warn("reference symbol make up has been skipped");
             }
-            {
-                /* Latest reference symbol make up
-                   Just looking for the second set of digits */
-                var referenceChunk = (String) corrections.get(SYM_REFERENCE);
-                var pattern = Pattern.compile("^(.*)\\b([0-9]+)$");
-                Matcher m = pattern.matcher(referenceChunk);
-                if (m.find()) {
-                    corrections.put(SYM_REFERENCE, m.group(2));
-                } else {
-                    log.warn("reference symbol make up has been skipped");
-                }
-            }
-            {
-                /* Latest ship to addr symbol make up
-                   Just allowing 5 digits as ZIP */
-                var shipToAddrChunk = (String) corrections.get(SYM_SHIP_TO_ADDR);
-                var pattern = Pattern.compile("^(.+[zZ][iI][pP]:) (.*)$");
-                Matcher m = pattern.matcher(shipToAddrChunk);
-                if (m.find()) {
-                    String zipAlpha = m.group(2);
-                    StringBuilder zipAlphaSimplified = new StringBuilder();
-                    for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < NUM_DIGITS_AFTER_ZIP; i++) {
-                        char ch = zipAlpha.charAt(i);
-                        if (!Character.isWhitespace(ch)) {
-                            zipAlphaSimplified.append(ch);
-                        }
+        }
+        {
+            /* Latest ship to addr symbol make up
+                Just allowing 5 digits as ZIP */
+            var shipToAddrChunk = (String) corrections.get(SYM_SHIP_TO_ADDR);
+            var pattern = Pattern.compile("^(.+[zZ][iI][pP]:) (.*)$");
+            Matcher m = pattern.matcher(shipToAddrChunk);
+            if (m.find()) {
+                String zipAlpha = m.group(2);
+                StringBuilder zipAlphaSimplified = new StringBuilder();
+                for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < NUM_DIGITS_AFTER_ZIP; i++) {
+                    char ch = zipAlpha.charAt(i);
+                    if (!Character.isWhitespace(ch)) {
+                        zipAlphaSimplified.append(ch);
                     }
-                    corrections.put(SYM_SHIP_TO_ADDR, m.group(1) + " " + zipAlphaSimplified);
-                } else {
-                    log.warn("ship to addr symbol make up has been skipped");
                 }
+                corrections.put(SYM_SHIP_TO_ADDR, m.group(1) + " " + zipAlphaSimplified);
+            } else {
+                log.warn("ship to addr symbol make up has been skipped");
             }
-            log.info("Turning the corrections into structured data");
-            return new XmlFormater(
+        }
+        log.info("Turning the corrections into structured data");
+
+        try {
+            formater = formaterClass.getConstructor(
+                    String.class,
+                    String.class,
+                    String.class,
+                    String.class,
+                    String.class,
+                    String.class,
+                    String.class,
+                    List.class,
+                    List.class,
+                    List.class
+            ).newInstance(
                     (String) corrections.get(SYM_INVOICE_NUM),
                     (String) corrections.get(SYM_SHIP_TO_ADDR),
                     (String) corrections.get(SYM_FOREIGN_CARRIER),
@@ -105,11 +109,14 @@ public class ExpCommercial {
                     (String) corrections.get(SYM_CON_ECO_NUM),
                     (List<MerchandiseItem>) corrections.get(SYM_MERC_DESC),
                     (List<String>) corrections.get(SYM_MERC_QUANTITY),
-                    (List<String>) corrections.get(SYM_MERC_WEIGHT)).render();
-        } catch (ParserConfigurationException ex) {
-            final String emsg = "The xml document containing the symbols can not be rendered";
-            throw new InvoiceOcrException(emsg, ex, ErrorCodes.XML_RENDER_ISSUE);
+                    (List<String>) corrections.get(SYM_MERC_WEIGHT));
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            throw new InvoiceOcrException("Formater can not be instanciated", ex);
         }
+    }
+
+    public S structureData() throws InvoiceOcrException {
+        return formater.render();
     }
 
     private enum MItemSM {

@@ -1,5 +1,6 @@
 package com.immortalcrab.bill.struct;
 
+import com.immortalcrab.bill.ocr.ErrorCodes;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
@@ -16,7 +17,7 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 
 @AllArgsConstructor
-public class XmlFormater {
+public class XmlFormater implements IOutputFormater<Document> {
 
     @NonNull
     private final String invoiceNum;
@@ -48,11 +49,17 @@ public class XmlFormater {
     @NonNull
     private final List<String> weights;
 
-    public Document render() throws ParserConfigurationException {
+    @Override
+    public Document render() throws InvoiceOcrException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        DocumentBuilder docBuilder;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            final String emsg = "The xml document containing the symbols can not be rendered";
+            throw new InvoiceOcrException(emsg, ex, ErrorCodes.XML_RENDER_ISSUE);
+        }
         Document doc = docBuilder.newDocument();
-
         Element invoiceElement = doc.createElement("Invoice");
         invoiceElement.setAttribute("invoiceNum", invoiceNum);
         invoiceElement.setAttribute("shipToAddr", shipToAddr);
