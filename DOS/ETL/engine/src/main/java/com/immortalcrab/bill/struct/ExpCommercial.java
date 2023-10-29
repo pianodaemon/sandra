@@ -64,18 +64,7 @@ public final class ExpCommercial<S> {
             final String firstElement = buffers.get(0);
             corrections.put(name, ManeuverHelper.removeNewLines(firstElement));
         }
-        {
-            /* Latest reference symbol make up
-                Just looking for the second set of digits */
-            var referenceChunk = (String) corrections.get(SYM_REFERENCE);
-            var pattern = Pattern.compile("^(.*)\\b([0-9]+)$");
-            Matcher m = pattern.matcher(referenceChunk);
-            if (m.find()) {
-                corrections.put(SYM_REFERENCE, m.group(2));
-            } else {
-                log.warn("reference symbol make up has been skipped");
-            }
-        }
+        corrections.put(SYM_REFERENCE, makeUpReference((String) corrections.get(SYM_REFERENCE)));
         corrections.put(SYM_SHIP_TO_ADDR, makeUpShipToAddr((String) corrections.get(SYM_SHIP_TO_ADDR)));
 
         log.info("Proceeding to set up the formater finally");
@@ -196,6 +185,17 @@ public final class ExpCommercial<S> {
             return m.group(1) + " " + zipAlphaSimplified;
         }
         final String emsg = "ship to addr symbol make up has been skipped";
+        throw new InvoiceOcrException(emsg, ErrorCodes.INVALID_INPUT_TO_PARSE);
+    }
+
+    private static String makeUpReference(String referenceChunk) throws InvoiceOcrException {
+        // Just looking for the second set of digits
+        var pattern = Pattern.compile("^(.*)\\b([0-9]+)$");
+        Matcher m = pattern.matcher(referenceChunk);
+        if (m.find()) {
+            return m.group(2);
+        }
+        final String emsg = "reference symbol make up has been skipped";
         throw new InvoiceOcrException(emsg, ErrorCodes.INVALID_INPUT_TO_PARSE);
     }
 }
