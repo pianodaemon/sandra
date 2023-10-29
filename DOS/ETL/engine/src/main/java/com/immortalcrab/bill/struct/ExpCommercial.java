@@ -100,18 +100,18 @@ public class ExpCommercial<S> {
                     List.class,
                     List.class
             ).newInstance(
-                    (String) corrections.get(SYM_INVOICE_NUM),
-                    (String) corrections.get(SYM_SHIP_TO_ADDR),
-                    (String) corrections.get(SYM_FOREIGN_CARRIER),
-                    (String) corrections.get(SYM_REFERENCE),
-                    (String) corrections.get(SYM_BULTOS),
-                    (String) corrections.get(SYM_SEAL),
-                    (String) corrections.get(SYM_CON_ECO_NUM),
-                    (List<MerchandiseItem>) corrections.get(SYM_MERC_DESC),
-                    (List<String>) corrections.get(SYM_MERC_QUANTITY),
-                    (List<String>) corrections.get(SYM_MERC_WEIGHT));
+                    corrections.get(SYM_INVOICE_NUM),
+                    corrections.get(SYM_SHIP_TO_ADDR),
+                    corrections.get(SYM_FOREIGN_CARRIER),
+                    corrections.get(SYM_REFERENCE),
+                    corrections.get(SYM_BULTOS),
+                    corrections.get(SYM_SEAL),
+                    corrections.get(SYM_CON_ECO_NUM),
+                    corrections.get(SYM_MERC_DESC),
+                    corrections.get(SYM_MERC_QUANTITY),
+                    corrections.get(SYM_MERC_WEIGHT));
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
-            throw new InvoiceOcrException("Formater can not be instanciated", ex);
+            throw new InvoiceOcrException("The formater has been aborted", ex);
         }
     }
 
