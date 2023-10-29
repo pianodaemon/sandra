@@ -4,20 +4,15 @@ import com.immortalcrab.bill.ocr.ErrorCodes;
 import com.immortalcrab.bill.ocr.InvoiceOcrException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.math.BigDecimal;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -100,56 +95,21 @@ public class ExpCommercial {
                 }
             }
             log.info("Turning the corrections into structured data");
-            return genXmlFromCorrections(corrections);
+            return new XmlFormater(
+                    (String) corrections.get(SYM_INVOICE_NUM),
+                    (String) corrections.get(SYM_SHIP_TO_ADDR),
+                    (String) corrections.get(SYM_FOREIGN_CARRIER),
+                    (String) corrections.get(SYM_REFERENCE),
+                    (String) corrections.get(SYM_BULTOS),
+                    (String) corrections.get(SYM_SEAL),
+                    (String) corrections.get(SYM_CON_ECO_NUM),
+                    (List<MerchandiseItem>) corrections.get(SYM_MERC_DESC),
+                    (List<String>) corrections.get(SYM_MERC_QUANTITY),
+                    (List<String>) corrections.get(SYM_MERC_WEIGHT)).render();
         } catch (ParserConfigurationException ex) {
             final String emsg = "The xml document containing the symbols can not be rendered";
             throw new InvoiceOcrException(emsg, ex, ErrorCodes.XML_RENDER_ISSUE);
         }
-    }
-
-    private static Document genXmlFromCorrections(Map<String, Object> corrections) throws ParserConfigurationException {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-
-        Element invoiceElement = doc.createElement("Invoice");
-        invoiceElement.setAttribute("invoiceNum", (String) corrections.get(SYM_INVOICE_NUM));
-        invoiceElement.setAttribute("shipToAddr", (String) corrections.get(SYM_SHIP_TO_ADDR));
-        invoiceElement.setAttribute("foreignCarrier", (String) corrections.get(SYM_FOREIGN_CARRIER));
-        invoiceElement.setAttribute("ref", (String) corrections.get(SYM_REFERENCE));
-        invoiceElement.setAttribute("bultos", (String) corrections.get(SYM_BULTOS));
-        invoiceElement.setAttribute("seal", (String) corrections.get(SYM_SEAL));
-        invoiceElement.setAttribute("conEcoNum", (String) corrections.get(SYM_CON_ECO_NUM));
-        doc.appendChild(invoiceElement);
-
-        Element merchandiseElement = doc.createElement("Merchandise");
-        invoiceElement.appendChild(merchandiseElement);
-        var mercs = (List<MerchandiseItem>) corrections.get(SYM_MERC_DESC);
-        var quantity = (List<String>) corrections.get(SYM_MERC_QUANTITY);
-        var weights = (List<String>) corrections.get(SYM_MERC_WEIGHT);
-        for (int idx = 0; idx < mercs.size(); idx++) {
-            var item = mercs.get(idx);
-            Element itemElement = doc.createElement("Item");
-            itemElement.setAttribute("partNumber", item.getPartNumber().orElseThrow());
-            itemElement.setAttribute("description", item.getDescription().orElseThrow());
-            itemElement.setAttribute("quantity", quantity.get(idx));
-            BigDecimal kgs = ManeuverHelper.removeCommasFromStrMagnitude(weights.get(idx));
-            itemElement.setAttribute("weightAsKilograms", kgs.toPlainString());
-            BigDecimal pounds = ManeuverHelper.kgsMagnitude(ManeuverHelper.removeCommasFromStrMagnitude(weights.get(idx)));
-            itemElement.setAttribute("weightAsPounds", pounds.toPlainString());
-            merchandiseElement.appendChild(itemElement);
-
-            if (!item.getSerialNumbers().isEmpty()) {
-                Element serialsElement = doc.createElement("Serials");
-                itemElement.appendChild(serialsElement);
-                for (var serial : item.getSerialNumbers()) {
-                    Element serialElement = doc.createElement("Serial");
-                    serialElement.setAttribute("alpha", serial);
-                    serialsElement.appendChild(serialElement);
-                }
-            }
-        }
-        return doc;
     }
 
     private enum MItemSM {
