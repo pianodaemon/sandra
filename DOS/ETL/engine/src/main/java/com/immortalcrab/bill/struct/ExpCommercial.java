@@ -33,9 +33,9 @@ public class ExpCommercial<S> {
     private static final String SYM_SHIP_TO_ADDR = "SHIP_TO_ADDR";
     private static final String SERIAL_NUMBER_COLON = "Serial Number:";
 
-    private final IOutputFormater<S> formater;
+    private final OutputFormater<S> formater;
 
-    public ExpCommercial(ISymbolProvider symProvider, Class<? extends IOutputFormater<S>> formaterClass) throws InvoiceOcrException {
+    public ExpCommercial(ISymbolProvider symProvider, Class<? extends OutputFormater<S>> formaterClass) throws InvoiceOcrException {
 
         InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
         Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
