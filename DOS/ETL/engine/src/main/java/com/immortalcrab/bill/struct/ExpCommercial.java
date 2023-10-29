@@ -12,11 +12,12 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.lang.reflect.InvocationTargetException;
-
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class ExpCommercial<S> {
+@AllArgsConstructor
+public final class ExpCommercial<S> {
 
     private static final int NUM_DIGITS_AFTER_ZIP = 5;
     private static final String DIST_FILE = "export_commercial_invoice.json";
@@ -36,8 +37,18 @@ public class ExpCommercial<S> {
     private final OutputFormater<S> formater;
 
     public ExpCommercial(ISymbolProvider symProvider, Class<? extends OutputFormater<S>> formaterClass) throws InvoiceOcrException {
+        this(
+                setupFormater(
+                        ExpCommercial.class.getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE),
+                        symProvider,
+                        formaterClass)
+        );
+    }
 
-        InputStream distInputStream = getClass().getClassLoader().getResourceAsStream("dists" + "/" + DIST_FILE);
+    private static <T> OutputFormater<T> setupFormater(
+            InputStream distInputStream,
+            ISymbolProvider symProvider,
+            Class<? extends OutputFormater<T>> formaterClass) throws InvoiceOcrException {
         Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
         Map<String, Object> corrections = new HashMap<>();
         UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
@@ -85,10 +96,9 @@ public class ExpCommercial<S> {
                 log.warn("ship to addr symbol make up has been skipped");
             }
         }
-        log.info("Turning the corrections into structured data");
-
+        log.info("Setting formater finally");
         try {
-            formater = formaterClass.getConstructor(
+            return formaterClass.getConstructor(
                     String.class,
                     String.class,
                     String.class,
@@ -116,6 +126,7 @@ public class ExpCommercial<S> {
     }
 
     public void carryStructureOut(String xmlFilePath) throws InvoiceOcrException {
+        log.info("Rendering data as structured information");
         formater.renderFeaturingSave(xmlFilePath);
     }
 
@@ -125,7 +136,7 @@ public class ExpCommercial<S> {
         SERIAL
     }
 
-    private List<MerchandiseItem> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
+    private static List<MerchandiseItem> parseMercsBuffers(List<String> buffers, List<String> primes) throws InvoiceOcrException {
         if (buffers.size() != primes.size()) {
             final String emsg = "Original and Prime buffers must feature equal number of elements";
             throw new InvoiceOcrException(emsg, ErrorCodes.INVALID_INPUT_TO_PARSE);
