@@ -1,7 +1,7 @@
 package com.immortalcrab.bill.ocr;
 
 import com.immortalcrab.bill.struct.ExpCommercial;
-import com.immortalcrab.bill.pdf.RenderPngHelper;
+import com.immortalcrab.bill.pdf.RenderImgHelper;
 import com.immortalcrab.bill.struct.XmlFormater;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -49,7 +49,7 @@ public class InvoiceOcr {
             throw new InvoiceOcrException(emsg, ex, ErrorCodes.INVALID_INPUT_TO_PARSE);
         }
 
-        BillOcr bocr = new BillOcr(RenderPngHelper::transformFromPdf);
+        BillOcr bocr = new BillOcr(RenderImgHelper::transformFromPdf);
         ExpCommercial<Document> invoice = new ExpCommercial<>((distInputStream) -> bocr.fetchSymbols(pdfFilePath, distInputStream), XmlFormater.class);
         invoice.carryStructureOut(xmlFilePath);
     }

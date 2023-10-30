@@ -17,7 +17,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RenderPngHelper {
+public class RenderImgHelper {
 
     private static final String IMAGE_EXT = "jpg";
     private static final String DEFAULT_OUTPUT_IMAGE_DIR = "outputImages";
@@ -30,7 +30,7 @@ public class RenderPngHelper {
             InputStream is,
             String title) throws IOException {
         Optional<String> outputImgDir = Optional.ofNullable(outputImageDirectory);
-        var rh = new RenderPngHelper(
+        var rh = new RenderImgHelper(
                 outputImgDir.orElse(DEFAULT_OUTPUT_IMAGE_DIR), is);
         return rh.snapshotForEachPage(title);
     }
