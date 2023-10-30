@@ -39,7 +39,7 @@ public class XmlFormater extends OutputFormater<Document> {
         invoiceElement.setAttribute("foreignCarrier", foreignCarrier);
         invoiceElement.setAttribute("ref", reference);
         invoiceElement.setAttribute("bultos", bultos);
-        invoiceElement.setAttribute("seal", seal);
+        invoiceElement.setAttribute("seal", NoiseSuppressor.normalizeSeal(seal));
         invoiceElement.setAttribute("conEcoNum", conEcoNum);
         doc.appendChild(invoiceElement);
 
