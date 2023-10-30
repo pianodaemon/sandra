@@ -69,7 +69,7 @@ public final class ExpCommercial<S> {
         corrections.put(SYM_REFERENCE, makeUpReference((String) corrections.get(SYM_REFERENCE)));
         corrections.put(SYM_SHIP_TO_ADDR, makeUpShipToAddr((String) corrections.get(SYM_SHIP_TO_ADDR)));
 
-        log.info("Appling normalizations as needed");
+        log.info("Applying normalizations as needed");
         corrections.put(SYM_SEAL, normalizeSeal.apply((String) corrections.get(SYM_SEAL)));
 
         log.info("Proceeding to set up the formater finally");
