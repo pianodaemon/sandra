@@ -52,6 +52,8 @@ public final class ExpCommercial<S> {
         Map<String, List<String>> syms = symProvider.fetchSymbols(distInputStream);
         Map<String, Object> corrections = new HashMap<>();
         UnaryOperator<String> replaceNewLinesForSpaces = symName -> syms.get(symName).get(0).replace("\n", " ");
+        UnaryOperator<String> normalizeSeal = seal -> seal.replaceAll("[^a-zA-Z0-9\\s]+", "");
+
         log.info("Applying corrections to the symbol buffers");
         corrections.put(SYM_MERC_DESC, parseMercsBuffers(syms.get(SYM_MERC_DESC), syms.get(SYM_MERC_DESC_PILOT)));
         corrections.put(SYM_MERC_WEIGHT, ManeuverHelper.sublistWithoutLast(ManeuverHelper.groomBuffers(syms.get(SYM_MERC_WEIGHT))));
@@ -66,6 +68,9 @@ public final class ExpCommercial<S> {
         }
         corrections.put(SYM_REFERENCE, makeUpReference((String) corrections.get(SYM_REFERENCE)));
         corrections.put(SYM_SHIP_TO_ADDR, makeUpShipToAddr((String) corrections.get(SYM_SHIP_TO_ADDR)));
+
+        log.info("Appling normalizations as needed");
+        corrections.put(SYM_SEAL, normalizeSeal.apply((String) corrections.get(SYM_SEAL)));
 
         log.info("Proceeding to set up the formater finally");
         try {
