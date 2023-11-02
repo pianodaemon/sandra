@@ -19,7 +19,8 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 public final class ExpCommercial<S> {
 
-    private static final int NUM_DIGITS_AFTER_ZIP = 5;
+    private static final int US_NUM_DIGITS_AFTER_ZIP = 5;
+    private static final int CA_NUM_DIGITS_AFTER_ZIP = 6;
     private static final String DIST_FILE = "export_commercial_invoice.json";
     private static final String SYM_MERC_DESC = "MERC_DESC";
     private static final String SYM_MERC_DESC_PILOT = "MERC_DESC_PILOT";
@@ -178,13 +179,19 @@ public final class ExpCommercial<S> {
     }
 
     private static String makeUpShipToAddr(final String shipToAddrChunk) throws InvoiceOcrException {
-        // Just allowing 5 digits as ZIP
+        var zipCaPattern = Pattern.compile("^\\b[A-Za-z]\\d[A-Za-z]( |-)\\d[A-Za-z]\\d\\b");
         var pattern = Pattern.compile("^(.+[zZ][iI][pP]:) (.*)$");
         Matcher m = pattern.matcher(shipToAddrChunk);
         if (m.find()) {
             String zipAlpha = m.group(2);
+            int numDigitsAfterZip = US_NUM_DIGITS_AFTER_ZIP; // XXX: It can be considered the default one
+            var zipCaMatcher = zipCaPattern.matcher(zipAlpha);
+            if (zipCaMatcher.find()) {
+                log.info("Detected a canadian zip");
+                numDigitsAfterZip = CA_NUM_DIGITS_AFTER_ZIP;
+            }
             StringBuilder zipAlphaSimplified = new StringBuilder();
-            for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < NUM_DIGITS_AFTER_ZIP; i++) {
+            for (int i = 0; i < zipAlpha.length() && zipAlphaSimplified.length() < numDigitsAfterZip; i++) {
                 char ch = zipAlpha.charAt(i);
                 if (!Character.isWhitespace(ch)) {
                     zipAlphaSimplified.append(ch);
