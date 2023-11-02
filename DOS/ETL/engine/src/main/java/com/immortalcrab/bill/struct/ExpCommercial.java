@@ -154,6 +154,9 @@ public final class ExpCommercial<S> {
                     } else {
                         var desc = merchandise.getDescription().orElse("") + " " + lineCorrected;
                         merchandise.setDescription(desc.trim());
+                        if (idx == (lines.length - 1)) {
+                            listMercs.add(merchandise);
+                        }
                     }
                     break;
                 case SERIAL:
