@@ -23,16 +23,17 @@ source ~/.profile
 > Note: `-i` and `-o` are required to provide a relative or absolute path to the PDF input and XML output.
 
 #### Compile and bundle along with dependencies for later execution
+Once the shadowJar has been succesfully compiled, please proceed to move it into your production's path 
 ```sh
 ./gradlew shadowJar
-mv ./engine/build/libs/invoice_ocr.jar $INSTALLATION_DIR
+mv ./engine/build/libs/invoice_ocr.jar $PRODUCTION_PATH
 ```
 
 #### Execution via jre (java runtime)
 ```sh
 java -jar  ./invoice_ocr.jar -i=./907623-PrecioVenta.pdf -o=./907623.xml
 ```
-> Note: `runtime` is distributed by oracle without sdk as well.
+> Note: `the java runtime` is distributed by oracle without sdk.
 
 
 
