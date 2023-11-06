@@ -13,3 +13,9 @@ dependencies {
 
     implementation "commons-cli:commons-cli:${commoncli_version}"
 }
+
+shadowJar {
+    archiveBaseName.set("${app_name}")
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}
