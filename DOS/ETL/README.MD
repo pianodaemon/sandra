@@ -42,7 +42,7 @@ java -jar  ./invoice_ocr.jar -i=./907623-PrecioVenta.pdf -o=./907623.xml
 #### Execution via bourne shell script
 System administrators can also wrap the execution through a shell script featuring the following content
 ```sh
-cat <<EOF >>invoice-ocr.sh
+cat <<'EOF' >>invoice-ocr.sh
 #!/bin/sh
 
 INVOICE_OCR_PATH="."
