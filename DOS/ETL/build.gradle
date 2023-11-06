@@ -1,5 +1,18 @@
-allprojects {
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:${shadow_plugin_version}"
+    }
+}
 
+plugins {
+    id "com.github.johnrengelman.shadow" version "${shadow_plugin_version}"
+}
+
+allprojects {
 
     repositories {
         mavenCentral()
