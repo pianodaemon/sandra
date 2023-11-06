@@ -2,6 +2,8 @@ description = 'engine'
 apply plugin: 'application'
 mainClassName = 'com.immortalcrab.bill.ocr.InvoiceOcr'
 
+apply plugin: "com.github.johnrengelman.shadow"
+
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
