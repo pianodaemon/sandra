@@ -30,6 +30,7 @@ mv ./engine/build/libs/invoice_ocr.jar $PRODUCTION_PATH
 ```
 
 #### Execution via jre (java runtime)
+Within production path proceed to execute via the java runtime.
 ```sh
 java -jar  ./invoice_ocr.jar -i=./907623-PrecioVenta.pdf -o=./907623.xml
 ```
