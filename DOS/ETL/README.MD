@@ -1,7 +1,7 @@
 ## ETI (A Sandra's child project for data operational systems)
 ETI stands for Extract transform of invoices
 
-### How to configure it firts of all
+### How to configure it first of all
 #### Install the shared library tesseract (the ocr lib) in Linux Debian
 Additionaly teserract requires a set of propietary fonts that shall be also installed.
 ```sh
@@ -37,7 +37,4 @@ Within production path proceed to execute via the java runtime.
 ```sh
 java -jar  ./invoice_ocr.jar -i=./907623-PrecioVenta.pdf -o=./907623.xml
 ```
-> Note: `the java runtime` is distributed by oracle without sdk.
-
-
-
+> Note: the `java runtime` is distributed by oracle without sdk.
