@@ -1,7 +1,7 @@
 ## ETI (A Sandra's child project for data operational systems)
 ETI stands for Extract transform of invoices
 
-### Building from source
+### How to configure it firts of all
 #### Install the shared library tesseract (the ocr lib) in Linux Debian
 Additionaly teserract requires a set of propietary fonts that shall be also installed.
 ```sh
@@ -16,12 +16,15 @@ echo 'export TESSDATA_PREFIX=$HOME/tessdata' >> ~/.profile
 source ~/.profile
 ```
 
+### Build and run for debugging purposes
 #### Compile and run along with needed arguments
 ```sh
 ./gradlew run --args="-i=../XXXXXX-export_comercial_invoce.pdf -o=../XXXXXX-export_comercial_invoce.xml"
 ```
 > Note: `-i` and `-o` are required to provide a relative or absolute path to the PDF input and XML output.
 
+
+### Build and deploy in production
 #### Compile and bundle along with dependencies for later execution
 Once the shadowJar has been succesfully compiled, please proceed to move it into your production's path 
 ```sh
